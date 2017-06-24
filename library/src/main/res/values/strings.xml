@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">library</string>
+
+    <string name="downlad_art_list">Загрузка списка статей</string>
+    <string name="download_all_title">Что скачать?</string>
+    <string name="download">Скачать</string>
+    <string name="stop_download">Остановить загрузку</string>
+    <string name="download_objects_title">Загрузка объектов</string>
+    <string name="error_notification_title">Ошибка</string>
+    <string name="error_notification_objects_list_download_content">Не удалось скачать список объектов</string>
+    <string name="download_complete_title">Загрузка завершена</string>
+    <string name="download_complete_title_content">Загружено %1$d из %2$d. Ошибок: %3$d</string>
+    <string name="download_progress_content">Загружено %1$d/%2$d. Ошибок: %3$d</string>
+    <string name="error_notification_recent_list_download_content">Не удалось загрузить список статей</string>
+    <string name="notification_recent_list_title">Загрузка списка статей</string>
+    <string name="download_recent_title">Загрузка статей</string>
 </resources>
