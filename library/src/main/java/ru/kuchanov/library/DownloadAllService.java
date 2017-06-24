@@ -78,11 +78,6 @@ public class DownloadAllService extends Service {
     private int mMaxProgress;
     private int mNumOfErrors;
 
-    /**
-     * use it to write arts to db in natural order
-     */
-    private int mNaturalOrder;
-
     private CompositeSubscription mCompositeSubscription;
 
     public static boolean isRunning() {
@@ -136,7 +131,6 @@ public class DownloadAllService extends Service {
         mCurProgress = 0;
         mMaxProgress = 0;
         mNumOfErrors = 0;
-        mNaturalOrder = 0;
         if (mCompositeSubscription != null && !mCompositeSubscription.isUnsubscribed()) {
             mCompositeSubscription.unsubscribe();
         }
@@ -279,7 +273,7 @@ public class DownloadAllService extends Service {
                                         mCurProgress, mMaxProgress, mNumOfErrors
                                 );
                             }
-                        } catch (Exception | ScpParseException e) {
+                        } catch (Exception e) {
                             Timber.e(e);
                             mNumOfErrors++;
                             mCurProgress++;
