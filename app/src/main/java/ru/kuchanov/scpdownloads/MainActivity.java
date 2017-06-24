@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setOnClickListener(v -> {
             Timber.d("Download service start");
-            DownloadAllService.startDownloadWithType(this, DownloadAllService.DownloadType.TYPE_ALL, 0, 40);
+            DownloadAllServiceTest.startDownloadWithType(this, DownloadAllService.DownloadType.TYPE_ALL, 0, 40, DownloadAllServiceTest.class);
         });
     }
 }

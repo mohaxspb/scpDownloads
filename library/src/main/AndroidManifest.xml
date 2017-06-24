@@ -10,7 +10,7 @@
         >
 
         <!--service-->
-        <service android:name=".DownloadAllService"/>
+        <!--<service android:name=".DownloadAllService"/>-->
 
     </application>
 

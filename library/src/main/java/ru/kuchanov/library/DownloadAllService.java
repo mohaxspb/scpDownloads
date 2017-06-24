@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -33,14 +34,15 @@ import static ru.kuchanov.library.DownloadAllService.DownloadType.TYPE_1;
  */
 public abstract class DownloadAllService extends Service {
 
+    private static final String TAG = DownloadAllService.class.getSimpleName();
+
     private static final int NOTIFICATION_ID = 42;
 
     public static final int RANGE_NONE = Integer.MIN_VALUE;
-
     private static final String EXTRA_DOWNLOAD_TYPE = "EXTRA_DOWNLOAD_TYPE";
     private static final String EXTRA_RANGE_START = "EXTRA_RANGE_START";
-    private static final String EXTRA_RANGE_END = "EXTRA_RANGE_END";
 
+    private static final String EXTRA_RANGE_END = "EXTRA_RANGE_END";
     private static final String ACTION_STOP = "ACTION_STOP";
     private static final String ACTION_START = "ACTION_START";
 
@@ -86,9 +88,10 @@ public abstract class DownloadAllService extends Service {
             Context ctx,
             @DownloadType String type,
             int rangeStart,
-            int rangeEnd
+            int rangeEnd,
+            Class clazz
     ) {
-        Intent intent = new Intent(ctx, DownloadAllService.class);
+        Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_START);
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_DOWNLOAD_TYPE, type);
@@ -121,6 +124,7 @@ public abstract class DownloadAllService extends Service {
     @Override
     public void onCreate() {
         Timber.d("onCreate");
+        Log.e(TAG, "onCreate");
         super.onCreate();
         instance = this;
     }
@@ -138,6 +142,7 @@ public abstract class DownloadAllService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Timber.d("onStartCommand: %s, %s, %s", intent, false, startId);
         if (intent == null || TextUtils.isEmpty(intent.getAction())) {
             stopDownloadAndRemoveNotif();
             return super.onStartCommand(intent, flags, startId);
