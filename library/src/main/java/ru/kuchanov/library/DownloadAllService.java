@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
-import android.util.Pair;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -203,6 +201,10 @@ public abstract class DownloadAllService extends Service {
 
     protected abstract Observable<List<ArticleModel>> getRecentArticlesForPage(int page);
 
+    protected abstract DbProviderModel getDbProviderModel();
+
+    protected abstract ArticleModel getArticleFromApi(String id);
+
     private void downloadAll() {
         Timber.d("downloadAll");
         showNotificationDownloadList();
@@ -238,17 +240,16 @@ public abstract class DownloadAllService extends Service {
 //                //test value
 //                .flatMap(list -> Observable.just(list.subList(0, mMaxProgress)))
                 .map(limitArticles)
-                //TODO refactor it - from here code is equal to objects one
                 .map(articles -> {
-                    List<Article> articlesToDownload = new ArrayList<>();
-                    DbProvider dbProvider = mDbProviderFactory.getDbProvider();
-                    for (Article article : articles) {
-                        Article articleInDb = dbProvider.getUnmanagedArticleSync(article.url);
-                        if (articleInDb == null || articleInDb.text == null) {
+                    List<ArticleModel> articlesToDownload = new ArrayList<>();
+                    DbProviderModel dbProvider = getDbProviderModel();
+                    for (ArticleModel article : articles) {
+                        ArticleModel articleInDb = dbProvider.getUnmanagedArticleSync(article.getUrl());
+                        if (articleInDb == null || TextUtils.isEmpty(articleInDb.getText())) {
                             articlesToDownload.add(article);
                         } else {
                             mCurProgress++;
-                            Timber.d("already downloaded: %s", article.url);
+                            Timber.d("already downloaded: %s", article.getUrl());
                             Timber.d("mCurProgress %s, mMaxProgress: %s", mCurProgress, mMaxProgress);
 //                            showNotificationDownloadProgress(getString(R.string.download_recent_title),
 //                                    mCurProgress, mMaxProgress, mNumOfErrors);
@@ -259,14 +260,14 @@ public abstract class DownloadAllService extends Service {
                 })
                 //download all articles and save them to DB
                 .flatMap(articles -> {
-                    DbProvider dbProvider = mDbProviderFactory.getDbProvider();
+                    DbProviderModel dbProvider = getDbProviderModel();
                     for (int i = 0; i < articles.size(); i++) {
-                        Article articleToDownload = articles.get(i);
+                        ArticleModel articleToDownload = articles.get(i);
                         try {
-                            Article articleDownloaded = mApiClient.getArticleFromApi(articleToDownload.url);
+                            ArticleModel articleDownloaded = getArticleFromApi(articleToDownload.getUrl());
                             if (articleDownloaded != null) {
                                 dbProvider.saveArticleSync(articleDownloaded, false);
-                                Timber.d("downloaded: %s", articleDownloaded.url);
+                                Timber.d("downloaded: %s", articleDownloaded.getUrl());
                                 mCurProgress++;
                                 Timber.d("mCurProgress %s, mMaxProgress: %s", mCurProgress, mMaxProgress);
                                 showNotificationDownloadProgress(getString(R.string.download_objects_title),
