@@ -25,8 +25,6 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
-import static ru.kuchanov.library.DownloadAllService.DownloadType.TYPE_1;
-
 /**
  * Created by mohax on 11.01.2017.
  * <p>
@@ -46,12 +44,11 @@ public abstract class DownloadAllService extends Service {
     private static final String ACTION_STOP = "ACTION_STOP";
     private static final String ACTION_START = "ACTION_START";
 
-    private int rangeStart;
-    private int rangeEnd;
+    private static DownloadAllService instance = null;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
-            TYPE_1, DownloadType.TYPE_2, DownloadType.TYPE_3, DownloadType.TYPE_RU,
+            DownloadType.TYPE_1, DownloadType.TYPE_2, DownloadType.TYPE_3, DownloadType.TYPE_4, DownloadType.TYPE_RU,
             DownloadType.TYPE_EXPERIMETS, DownloadType.TYPE_OTHER, DownloadType.TYPE_INCIDENTS,
             DownloadType.TYPE_INTERVIEWS, DownloadType.TYPE_ARCHIVE, DownloadType.TYPE_JOKES,
             DownloadType.TYPE_ALL
@@ -60,6 +57,7 @@ public abstract class DownloadAllService extends Service {
         String TYPE_1 = "TYPE_1";
         String TYPE_2 = "TYPE_2";
         String TYPE_3 = "TYPE_3";
+        String TYPE_4 = "TYPE_4";
         String TYPE_RU = "TYPE_RU";
 
         String TYPE_EXPERIMETS = "TYPE_Experiments";
@@ -72,7 +70,8 @@ public abstract class DownloadAllService extends Service {
         String TYPE_ALL = "TYPE_ALL";
     }
 
-    private static DownloadAllService instance = null;
+    private int rangeStart;
+    private int rangeEnd;
 
     private int mCurProgress;
     private int mMaxProgress;

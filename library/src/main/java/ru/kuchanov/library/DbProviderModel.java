@@ -12,4 +12,6 @@ public interface DbProviderModel {
     void saveArticleSync(ArticleModel articleModel, boolean closeDbConnection);
 
     void close();
+
+    int getScore();
 }
