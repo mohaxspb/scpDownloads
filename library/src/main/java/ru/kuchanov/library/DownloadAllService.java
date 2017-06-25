@@ -4,16 +4,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -46,29 +42,29 @@ public abstract class DownloadAllService extends Service {
 
     private static DownloadAllService instance = null;
 
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({
-            DownloadType.TYPE_1, DownloadType.TYPE_2, DownloadType.TYPE_3, DownloadType.TYPE_4, DownloadType.TYPE_RU,
-            DownloadType.TYPE_EXPERIMETS, DownloadType.TYPE_OTHER, DownloadType.TYPE_INCIDENTS,
-            DownloadType.TYPE_INTERVIEWS, DownloadType.TYPE_ARCHIVE, DownloadType.TYPE_JOKES,
-            DownloadType.TYPE_ALL
-    })
-    public @interface DownloadType {
-        String TYPE_1 = "TYPE_1";
-        String TYPE_2 = "TYPE_2";
-        String TYPE_3 = "TYPE_3";
-        String TYPE_4 = "TYPE_4";
-        String TYPE_RU = "TYPE_RU";
-
-        String TYPE_EXPERIMETS = "TYPE_Experiments";
-        String TYPE_OTHER = "TYPE_Other";
-        String TYPE_INCIDENTS = "TYPE_Incidents";
-        String TYPE_INTERVIEWS = "TYPE_Interviews";
-        String TYPE_ARCHIVE = "TYPE_Archive";
-        String TYPE_JOKES = "TYPE_Jokes";
-
-        String TYPE_ALL = "TYPE_ALL";
-    }
+//    @Retention(RetentionPolicy.SOURCE)
+//    @StringDef({
+//            DownloadType.TYPE_1, DownloadType.TYPE_2, DownloadType.TYPE_3, DownloadType.TYPE_4, DownloadType.TYPE_RU,
+//            DownloadType.TYPE_EXPERIMETS, DownloadType.TYPE_OTHER, DownloadType.TYPE_INCIDENTS,
+//            DownloadType.TYPE_INTERVIEWS, DownloadType.TYPE_ARCHIVE, DownloadType.TYPE_JOKES,
+//            DownloadType.TYPE_ALL
+//    })
+//    public @interface DownloadType {
+//        String TYPE_1 = "TYPE_1";
+//        String TYPE_2 = "TYPE_2";
+//        String TYPE_3 = "TYPE_3";
+//        String TYPE_4 = "TYPE_4";
+//        String TYPE_RU = "TYPE_RU";
+//
+//        String TYPE_EXPERIMETS = "TYPE_Experiments";
+//        String TYPE_OTHER = "TYPE_Other";
+//        String TYPE_INCIDENTS = "TYPE_Incidents";
+//        String TYPE_INTERVIEWS = "TYPE_Interviews";
+//        String TYPE_ARCHIVE = "TYPE_Archive";
+//        String TYPE_JOKES = "TYPE_Jokes";
+//
+//        String TYPE_ALL = "TYPE_ALL";
+//    }
 
     private int rangeStart;
     private int rangeEnd;
@@ -85,16 +81,17 @@ public abstract class DownloadAllService extends Service {
 
     public static void startDownloadWithType(
             Context ctx,
-            @DownloadType String type,
+            DialogUtils.DownloadType type,
             int rangeStart,
             int rangeEnd,
             Class clazz
     ) {
         Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_START);
-        Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_DOWNLOAD_TYPE, type);
-        intent.putExtras(bundle);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(EXTRA_DOWNLOAD_TYPE, type);
+//        intent.putExtras(bundle);
+        intent.putExtra(EXTRA_DOWNLOAD_TYPE, type);
         intent.putExtra(EXTRA_RANGE_START, rangeStart);
         intent.putExtra(EXTRA_RANGE_END, rangeEnd);
         ctx.startService(intent);
@@ -156,8 +153,8 @@ public abstract class DownloadAllService extends Service {
         rangeEnd = intent.getIntExtra(EXTRA_RANGE_END, RANGE_NONE);
         Timber.d("rangeStart/rangeEnd: %s/%s", rangeStart, rangeEnd);
 
-        @DownloadType
-        String type = intent.getStringExtra(EXTRA_DOWNLOAD_TYPE);
+//        @DownloadType
+        DialogUtils.DownloadType type = intent.getParcelableExtra(EXTRA_DOWNLOAD_TYPE);
         Timber.d("onStartCommand with type; %s", type);
         switch (type) {
 //            case DownloadType.TYPE_1:
@@ -190,7 +187,7 @@ public abstract class DownloadAllService extends Service {
 //            case DownloadType.TYPE_JOKES:
 //                downloadObjects(Constants.Urls.JOKES, Article.FIELD_IS_IN_JOKES);
 //                break;
-            case DownloadType.TYPE_ALL:
+            case TYPE_ALL:
                 downloadAll();
                 break;
             default:

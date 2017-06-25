@@ -2,7 +2,7 @@ package ru.kuchanov.library;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.view.View;
@@ -13,12 +13,15 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static ru.kuchanov.library.DialogUtils.DownloadType.TYPE_ALL;
 
 /**
  * Created by mohax on 29.05.2017.
@@ -29,20 +32,88 @@ public abstract class DialogUtils {
 
     //download all consts
     //TODO need to refactor it and use one enum here and in service
-    private static final int TYPE_OBJ_1 = 0;
-    private static final int TYPE_OBJ_2 = 1;
-    private static final int TYPE_OBJ_3 = 2;
+//    private static final int TYPE_OBJ_1 = 0;
+//    private static final int TYPE_OBJ_2 = 1;
+//    private static final int TYPE_OBJ_3 = 2;
+//
+//    private static final int TYPE_OBJ_RU = 3;
+//
+//    private static final int TYPE_EXPERIMETS = 4;
+//    private static final int TYPE_OTHER = 5;
+//    private static final int TYPE_INCIDENTS = 6;
+//    private static final int TYPE_INTERVIEWS = 7;
+//    private static final int TYPE_ARCHIVE = 8;
+//
+//    private static final int TYPE_JOKES = 9;
+//    private static final int TYPE_ALL = 10;
 
-    private static final int TYPE_OBJ_RU = 3;
+    public enum DownloadType {
 
-    private static final int TYPE_EXPERIMETS = 4;
-    private static final int TYPE_OTHER = 5;
-    private static final int TYPE_INCIDENTS = 6;
-    private static final int TYPE_INTERVIEWS = 7;
-    private static final int TYPE_ARCHIVE = 8;
+        TYPE_1(R.string.type_1),
+        TYPE_2(R.string.type_2),
+        TYPE_3(R.string.type_3),
+        TYPE_4(R.string.type_4),
+        TYPE_RU(R.string.type_ru),
 
-    private static final int TYPE_JOKES = 9;
-    private static final int TYPE_ALL = 10;
+        TYPE_EXPERIMENTS(R.string.type_experiments),
+        TYPE_OTHER(R.string.type_other),
+        TYPE_INCIDENTS(R.string.type_incidents),
+        TYPE_INTERVIEWS(R.string.type_interviews),
+        TYPE_ARCHIVE(R.string.type_archive),
+        TYPE_JOKES(R.string.type_jokes),
+
+        TYPE_ALL(R.string.type_all);
+
+        @StringRes
+        private final int mTitle;
+
+        DownloadType(@StringRes int title) {
+            this.mTitle = title;
+        }
+
+        @StringRes
+        public int getTitle() {
+            return mTitle;
+        }
+
+
+        class Entry {
+            private Context mContext;
+
+            Entry(Context context) {
+                mContext = context;
+            }
+
+            @Override
+            public String toString() {
+                return mContext.getString(mTitle);
+            }
+            
+            public DownloadType getType(){
+                return DownloadType.this;
+            }
+        }
+
+        public List<Entry> getEntries(Context context) {
+            List<Entry> entries = new ArrayList<>();
+
+            for (DownloadType downloadType : DownloadType.values()) {
+                entries.add(new Entry(context));
+            }
+
+            return entries;
+        }
+
+        public List<Entry> getEntries(List<DownloadType> downloadTypes, Context context) {
+            List<Entry> entries = new ArrayList<>();
+
+            for (DownloadType downloadType : downloadTypes) {
+                entries.add(new Entry(context));
+            }
+
+            return entries;
+        }
+    }
 
     private MyPreferenceManagerModel mPreferenceManager;
     private DbProviderFactoryModel mDbProviderFactory;
@@ -58,14 +129,18 @@ public abstract class DialogUtils {
         mApiClient = apiClient;
     }
 
+    public abstract List<DownloadType.Entry> getDownloadTypesEntries(Context context);
+
     public void showDownloadDialog(Context context) {
+        List<DownloadType.Entry> entries = getDownloadTypesEntries(context);
+        
         MaterialDialog materialDialog;
         materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.download_all_title)
-                .items(R.array.download_types)
+                .items(entries)
                 .itemsCallbackSingleChoice(-1, (dialog, itemView, which, text) -> {
                     Timber.d("which: %s, text: %s", which, text);
-                    if (!DownloadAllService.isRunning()) {
+                    if (!isServiceRunning()) {
                         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                     }
                     return true;
@@ -79,82 +154,83 @@ public abstract class DialogUtils {
                     Timber.d("onPositive clicked");
                     Timber.d("dialog.getSelectedIndex(): %s", dialog.getSelectedIndex());
 
-                    @DownloadAllService.DownloadType
-                    String type;
-                    switch (dialog.getSelectedIndex()) {
-                        case TYPE_OBJ_1:
-                            type = DownloadAllService.DownloadType.TYPE_1;
-                            break;
-                        case TYPE_OBJ_2:
-                            type = DownloadAllService.DownloadType.TYPE_2;
-                            break;
-                        case TYPE_OBJ_3:
-                            type = DownloadAllService.DownloadType.TYPE_3;
-                            break;
-                        case TYPE_OBJ_RU:
-                            type = DownloadAllService.DownloadType.TYPE_RU;
-                            break;
-                        case TYPE_EXPERIMETS:
-                            type = DownloadAllService.DownloadType.TYPE_EXPERIMETS;
-                            break;
-                        case TYPE_OTHER:
-                            type = DownloadAllService.DownloadType.TYPE_OTHER;
-                            break;
-                        case TYPE_INCIDENTS:
-                            type = DownloadAllService.DownloadType.TYPE_INCIDENTS;
-                            break;
-                        case TYPE_INTERVIEWS:
-                            type = DownloadAllService.DownloadType.TYPE_INTERVIEWS;
-                            break;
-                        case TYPE_ARCHIVE:
-                            type = DownloadAllService.DownloadType.TYPE_ARCHIVE;
-                            break;
-                        case TYPE_JOKES:
-                            type = DownloadAllService.DownloadType.TYPE_JOKES;
-                            break;
-                        case TYPE_ALL:
-                            type = DownloadAllService.DownloadType.TYPE_ALL;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("unexpected type: " + dialog.getSelectedIndex());
-                    }
+//                    @DownloadAllService.DownloadType
+//                    String type;
+//                    switch (dialog.getSelectedIndex()) {
+//                        case TYPE_OBJ_1:
+//                            type = DownloadAllService.DownloadType.TYPE_1;
+//                            break;
+//                        case TYPE_OBJ_2:
+//                            type = DownloadAllService.DownloadType.TYPE_2;
+//                            break;
+//                        case TYPE_OBJ_3:
+//                            type = DownloadAllService.DownloadType.TYPE_3;
+//                            break;
+//                        case TYPE_OBJ_RU:
+//                            type = DownloadAllService.DownloadType.TYPE_RU;
+//                            break;
+//                        case TYPE_EXPERIMETS:
+//                            type = DownloadAllService.DownloadType.TYPE_EXPERIMETS;
+//                            break;
+//                        case TYPE_OTHER:
+//                            type = DownloadAllService.DownloadType.TYPE_OTHER;
+//                            break;
+//                        case TYPE_INCIDENTS:
+//                            type = DownloadAllService.DownloadType.TYPE_INCIDENTS;
+//                            break;
+//                        case TYPE_INTERVIEWS:
+//                            type = DownloadAllService.DownloadType.TYPE_INTERVIEWS;
+//                            break;
+//                        case TYPE_ARCHIVE:
+//                            type = DownloadAllService.DownloadType.TYPE_ARCHIVE;
+//                            break;
+//                        case TYPE_JOKES:
+//                            type = DownloadAllService.DownloadType.TYPE_JOKES;
+//                            break;
+//                        case TYPE_ALL:
+//                            type = DownloadAllService.DownloadType.TYPE_ALL;
+//                            break;
+//                        default:
+//                            throw new IllegalArgumentException("unexpected type: " + dialog.getSelectedIndex());
+//                    }
+                    DownloadType type = entries.get(dialog.getSelectedIndex()).getType();
 
-                    logDownloadAttempt();
+                    logDownloadAttempt(type);
 
                     String link;
-                    switch (type) {
-                        case DownloadAllService.DownloadType.TYPE_1:
+                    switch (entries.get(dialog.getSelectedIndex()).getType()) {
+                        case TYPE_1:
                             link = Constants.Urls.OBJECTS_1;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_2:
+                        case TYPE_2:
                             link = Constants.Urls.OBJECTS_2;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_3:
+                        case TYPE_3:
                             link = Constants.Urls.OBJECTS_3;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_RU:
+                        case TYPE_RU:
                             link = Constants.Urls.OBJECTS_RU;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_EXPERIMETS:
+                        case TYPE_EXPERIMENTS:
                             link = Constants.Urls.PROTOCOLS;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_OTHER:
+                        case TYPE_OTHER:
                             link = Constants.Urls.OTHERS;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_INCIDENTS:
+                        case TYPE_INCIDENTS:
                             link = Constants.Urls.INCEDENTS;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_INTERVIEWS:
+                        case TYPE_INTERVIEWS:
                             link = Constants.Urls.INTERVIEWS;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_ARCHIVE:
+                        case TYPE_ARCHIVE:
                             link = Constants.Urls.ARCHIVE;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_JOKES:
+                        case TYPE_JOKES:
                             link = Constants.Urls.JOKES;
                             break;
-                        case DownloadAllService.DownloadType.TYPE_ALL:
-                            link = DownloadAllService.DownloadType.TYPE_ALL;
+                        case TYPE_ALL:
+                            link = TYPE_ALL.toString();
                             break;
                         default:
                             throw new IllegalArgumentException("unexpected type");
@@ -211,6 +287,8 @@ public abstract class DialogUtils {
 
         materialDialog.show();
     }
+
+    protected abstract boolean isServiceRunning();
 
     private void loadArticlesAndCountThem(
             Context context,
@@ -358,5 +436,5 @@ public abstract class DialogUtils {
      */
     protected abstract void onIncreaseLimitClick();
 
-    protected abstract void logDownloadAttempt();
+    protected abstract void logDownloadAttempt(DownloadType type);
 }
