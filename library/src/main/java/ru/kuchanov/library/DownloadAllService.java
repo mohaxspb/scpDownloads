@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -81,7 +82,7 @@ public abstract class DownloadAllService extends Service {
 
     public static void startDownloadWithType(
             Context ctx,
-            DialogUtils.DownloadType type,
+            @StringRes int type,
             int rangeStart,
             int rangeEnd,
             Class clazz
@@ -153,48 +154,14 @@ public abstract class DownloadAllService extends Service {
         rangeEnd = intent.getIntExtra(EXTRA_RANGE_END, RANGE_NONE);
         Timber.d("rangeStart/rangeEnd: %s/%s", rangeStart, rangeEnd);
 
-//        @DownloadType
-        DialogUtils.DownloadType type = intent.getParcelableExtra(EXTRA_DOWNLOAD_TYPE);
-        Timber.d("onStartCommand with type; %s", type);
-        switch (type) {
-//            case DownloadType.TYPE_1:
-//                downloadObjects(Constants.Urls.OBJECTS_1, Article.FIELD_IS_IN_OBJECTS_1);
-//                break;
-//            case DownloadType.TYPE_2:
-//                downloadObjects(Constants.Urls.OBJECTS_2, Article.FIELD_IS_IN_OBJECTS_2);
-//                break;
-//            case DownloadType.TYPE_3:
-//                downloadObjects(Constants.Urls.OBJECTS_3, Article.FIELD_IS_IN_OBJECTS_3);
-//                break;
-//            case DownloadType.TYPE_RU:
-//                downloadObjects(Constants.Urls.OBJECTS_RU, Article.FIELD_IS_IN_OBJECTS_RU);
-//                break;
-//            case DownloadType.TYPE_EXPERIMETS:
-//                downloadObjects(Constants.Urls.PROTOCOLS, Article.FIELD_IS_IN_EXPERIMETS);
-//                break;
-//            case DownloadType.TYPE_OTHER:
-//                downloadObjects(Constants.Urls.OTHERS, Article.FIELD_IS_IN_OTHER);
-//                break;
-//            case DownloadType.TYPE_INCIDENTS:
-//                downloadObjects(Constants.Urls.INCEDENTS, Article.FIELD_IS_IN_INCIDENTS);
-//                break;
-//            case DownloadType.TYPE_INTERVIEWS:
-//                downloadObjects(Constants.Urls.INTERVIEWS, Article.FIELD_IS_IN_INTERVIEWS);
-//                break;
-//            case DownloadType.TYPE_ARCHIVE:
-//                downloadObjects(Constants.Urls.ARCHIVE, Article.FIELD_IS_IN_ARCHIVE);
-//                break;
-//            case DownloadType.TYPE_JOKES:
-//                downloadObjects(Constants.Urls.JOKES, Article.FIELD_IS_IN_JOKES);
-//                break;
-            case TYPE_ALL:
-                downloadAll();
-                break;
-            default:
-                throw new IllegalArgumentException("unexpected type");
-        }
+        @StringRes
+        int type = intent.getIntExtra(EXTRA_DOWNLOAD_TYPE, 0);
+        download(type);
+
         return super.onStartCommand(intent, flags, startId);
     }
+
+    protected abstract void download(@StringRes int type);
 
     protected abstract Observable<Integer> getRecentArticlesPageCountObservable();
 

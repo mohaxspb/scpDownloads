@@ -21,14 +21,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static ru.kuchanov.library.DialogUtils.DownloadType.TYPE_ALL;
-
 /**
  * Created by mohax on 29.05.2017.
  * <p>
  * for ScpFoundationRu
  */
-public abstract class DialogUtils {
+public abstract class DialogUtils<S extends DownloadAllService> {
 
     //download all consts
     //TODO need to refactor it and use one enum here and in service
@@ -47,73 +45,72 @@ public abstract class DialogUtils {
 //    private static final int TYPE_JOKES = 9;
 //    private static final int TYPE_ALL = 10;
 
-    public enum DownloadType {
-
-        TYPE_1(R.string.type_1),
-        TYPE_2(R.string.type_2),
-        TYPE_3(R.string.type_3),
-        TYPE_4(R.string.type_4),
-        TYPE_RU(R.string.type_ru),
-
-        TYPE_EXPERIMENTS(R.string.type_experiments),
-        TYPE_OTHER(R.string.type_other),
-        TYPE_INCIDENTS(R.string.type_incidents),
-        TYPE_INTERVIEWS(R.string.type_interviews),
-        TYPE_ARCHIVE(R.string.type_archive),
-        TYPE_JOKES(R.string.type_jokes),
-
-        TYPE_ALL(R.string.type_all);
-
-        @StringRes
-        private final int mTitle;
-
-        DownloadType(@StringRes int title) {
-            this.mTitle = title;
-        }
-
-        @StringRes
-        public int getTitle() {
-            return mTitle;
-        }
-
-
-        class Entry {
-            private Context mContext;
-
-            Entry(Context context) {
-                mContext = context;
-            }
-
-            @Override
-            public String toString() {
-                return mContext.getString(mTitle);
-            }
-            
-            public DownloadType getType(){
-                return DownloadType.this;
-            }
-        }
-
-        public List<Entry> getEntries(Context context) {
-            List<Entry> entries = new ArrayList<>();
-
-            for (DownloadType downloadType : DownloadType.values()) {
-                entries.add(new Entry(context));
-            }
-
-            return entries;
-        }
-
-        public List<Entry> getEntries(List<DownloadType> downloadTypes, Context context) {
-            List<Entry> entries = new ArrayList<>();
-
-            for (DownloadType downloadType : downloadTypes) {
-                entries.add(new Entry(context));
-            }
-
-            return entries;
-        }
-    }
+//    public enum DownloadType {
+//
+//        TYPE_1(R.string.type_1),
+//        TYPE_2(R.string.type_2),
+//        TYPE_3(R.string.type_3),
+//        TYPE_4(R.string.type_4),
+//        TYPE_RU(R.string.type_ru),
+//
+//        TYPE_EXPERIMENTS(R.string.type_experiments),
+//        TYPE_OTHER(R.string.type_other),
+//        TYPE_INCIDENTS(R.string.type_incidents),
+//        TYPE_INTERVIEWS(R.string.type_interviews),
+//        TYPE_ARCHIVE(R.string.type_archive),
+//        TYPE_JOKES(R.string.type_jokes),
+//
+//        TYPE_ALL(R.string.type_all);
+//
+//        @StringRes
+//        private final int mTitle;
+//
+//        DownloadType(@StringRes int title) {
+//            this.mTitle = title;
+//        }
+//
+//        @StringRes
+//        public int getTitle() {
+//            return mTitle;
+//        }
+//
+//        class Entry {
+//            private Context mContext;
+//
+//            Entry(Context context) {
+//                mContext = context;
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return mContext.getString(mTitle);
+//            }
+//
+//            public DownloadType getType() {
+//                return DownloadType.this;
+//            }
+//        }
+//
+//        public List<Entry> getEntries(Context context) {
+//            List<Entry> entries = new ArrayList<>();
+//
+//            for (DownloadType downloadType : DownloadType.values()) {
+//                entries.add(new Entry(context));
+//            }
+//
+//            return entries;
+//        }
+//
+//        public List<Entry> getEntries(List<DownloadType> downloadTypes, Context context) {
+//            List<Entry> entries = new ArrayList<>();
+//
+//            for (DownloadType downloadType : downloadTypes) {
+//                entries.add(new Entry(context));
+//            }
+//
+//            return entries;
+//        }
+//    }
 
     private MyPreferenceManagerModel mPreferenceManager;
     private DbProviderFactoryModel mDbProviderFactory;
@@ -129,11 +126,15 @@ public abstract class DialogUtils {
         mApiClient = apiClient;
     }
 
-    public abstract List<DownloadType.Entry> getDownloadTypesEntries(Context context);
+    public abstract List<DownloadEntry> getDownloadTypesEntries(Context context);
 
-    public void showDownloadDialog(Context context) {
-        List<DownloadType.Entry> entries = getDownloadTypesEntries(context);
-        
+    public interface OnDownloadPositiveClickListener {
+        void onPositiveClick(int selectedItemPosition);
+    }
+
+    public void showDownloadDialog(Context context, OnDownloadPositiveClickListener onDownloadPositiveClickListener) {
+        List<DownloadEntry> entries = getDownloadTypesEntries(context);
+
         MaterialDialog materialDialog;
         materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.download_all_title)
@@ -153,118 +154,80 @@ public abstract class DialogUtils {
                 .onPositive((dialog, which) -> {
                     Timber.d("onPositive clicked");
                     Timber.d("dialog.getSelectedIndex(): %s", dialog.getSelectedIndex());
-
-//                    @DownloadAllService.DownloadType
-//                    String type;
-//                    switch (dialog.getSelectedIndex()) {
-//                        case TYPE_OBJ_1:
-//                            type = DownloadAllService.DownloadType.TYPE_1;
+                    onDownloadPositiveClickListener.onPositiveClick(dialog.getSelectedIndex());
+//
+//                    DownloadType type = entries.get(dialog.getSelectedIndex()).getType();
+//
+//                    logDownloadAttempt(type);
+//
+//                    String link;
+//                    switch (entries.get(dialog.getSelectedIndex()).getType()) {
+//                        case TYPE_1:
+//                            link = Constants.Urls.OBJECTS_1;
 //                            break;
-//                        case TYPE_OBJ_2:
-//                            type = DownloadAllService.DownloadType.TYPE_2;
+//                        case TYPE_2:
+//                            link = Constants.Urls.OBJECTS_2;
 //                            break;
-//                        case TYPE_OBJ_3:
-//                            type = DownloadAllService.DownloadType.TYPE_3;
+//                        case TYPE_3:
+//                            link = Constants.Urls.OBJECTS_3;
 //                            break;
-//                        case TYPE_OBJ_RU:
-//                            type = DownloadAllService.DownloadType.TYPE_RU;
+//                        case TYPE_RU:
+//                            link = Constants.Urls.OBJECTS_RU;
 //                            break;
-//                        case TYPE_EXPERIMETS:
-//                            type = DownloadAllService.DownloadType.TYPE_EXPERIMETS;
+//                        case TYPE_EXPERIMENTS:
+//                            link = Constants.Urls.PROTOCOLS;
 //                            break;
 //                        case TYPE_OTHER:
-//                            type = DownloadAllService.DownloadType.TYPE_OTHER;
+//                            link = Constants.Urls.OTHERS;
 //                            break;
 //                        case TYPE_INCIDENTS:
-//                            type = DownloadAllService.DownloadType.TYPE_INCIDENTS;
+//                            link = Constants.Urls.INCEDENTS;
 //                            break;
 //                        case TYPE_INTERVIEWS:
-//                            type = DownloadAllService.DownloadType.TYPE_INTERVIEWS;
+//                            link = Constants.Urls.INTERVIEWS;
 //                            break;
 //                        case TYPE_ARCHIVE:
-//                            type = DownloadAllService.DownloadType.TYPE_ARCHIVE;
+//                            link = Constants.Urls.ARCHIVE;
 //                            break;
 //                        case TYPE_JOKES:
-//                            type = DownloadAllService.DownloadType.TYPE_JOKES;
+//                            link = Constants.Urls.JOKES;
 //                            break;
 //                        case TYPE_ALL:
-//                            type = DownloadAllService.DownloadType.TYPE_ALL;
+//                            link = TYPE_ALL.toString();
 //                            break;
 //                        default:
-//                            throw new IllegalArgumentException("unexpected type: " + dialog.getSelectedIndex());
+//                            throw new IllegalArgumentException("unexpected type");
 //                    }
-                    DownloadType type = entries.get(dialog.getSelectedIndex()).getType();
-
-                    logDownloadAttempt(type);
-
-                    String link;
-                    switch (entries.get(dialog.getSelectedIndex()).getType()) {
-                        case TYPE_1:
-                            link = Constants.Urls.OBJECTS_1;
-                            break;
-                        case TYPE_2:
-                            link = Constants.Urls.OBJECTS_2;
-                            break;
-                        case TYPE_3:
-                            link = Constants.Urls.OBJECTS_3;
-                            break;
-                        case TYPE_RU:
-                            link = Constants.Urls.OBJECTS_RU;
-                            break;
-                        case TYPE_EXPERIMENTS:
-                            link = Constants.Urls.PROTOCOLS;
-                            break;
-                        case TYPE_OTHER:
-                            link = Constants.Urls.OTHERS;
-                            break;
-                        case TYPE_INCIDENTS:
-                            link = Constants.Urls.INCEDENTS;
-                            break;
-                        case TYPE_INTERVIEWS:
-                            link = Constants.Urls.INTERVIEWS;
-                            break;
-                        case TYPE_ARCHIVE:
-                            link = Constants.Urls.ARCHIVE;
-                            break;
-                        case TYPE_JOKES:
-                            link = Constants.Urls.JOKES;
-                            break;
-                        case TYPE_ALL:
-                            link = TYPE_ALL.toString();
-                            break;
-                        default:
-                            throw new IllegalArgumentException("unexpected type");
-                    }
-
-                    Observable<Integer> numOfArticlesObservable;
-                    Observable<List<ArticleModel>> articlesObservable;
-                    switch (link) {
-                        case DownloadAllService.DownloadType.TYPE_ALL:
-                            //simply start download all with popup for limit users,
-                            //in which tell, that we can't now how many arts he can load
-                            numOfArticlesObservable = Observable.just(Integer.MIN_VALUE);
-                            break;
-                        case Constants.Urls.ARCHIVE:
-                            articlesObservable = mApiClient.getMaterialsArchiveArticles();
-                            numOfArticlesObservable = articlesObservable.map(List::size);
-                            break;
-                        case Constants.Urls.JOKES:
-                            articlesObservable = mApiClient.getMaterialsJokesArticles();
-                            numOfArticlesObservable = articlesObservable.map(List::size);
-                            break;
-                        case Constants.Urls.OBJECTS_1:
-                        case Constants.Urls.OBJECTS_2:
-                        case Constants.Urls.OBJECTS_3:
-                        case Constants.Urls.OBJECTS_RU:
-                            articlesObservable = mApiClient.getObjectsArticles(link);
-                            numOfArticlesObservable = articlesObservable.map(List::size);
-                            break;
-                        default:
-                            articlesObservable = mApiClient.getMaterialsArticles(link);
-                            numOfArticlesObservable = articlesObservable.map(List::size);
-                            break;
-                    }
-                    loadArticlesAndCountThem(context, numOfArticlesObservable, type);
+//
+//                    Observable<Integer> numOfArticlesObservable;
+//                    Observable<List<ArticleModel>> articlesObservable;
+//                    switch (link) {
+//                        case DownloadAllService.DownloadType.TYPE_ALL:
+//                            //simply start download all with popup for limit users,
+//                            //in which tell, that we can't now how many arts he can load
+//                            numOfArticlesObservable = Observable.just(Integer.MIN_VALUE);
+//                            break;
+//                        case Constants.Urls.ARCHIVE:
+//                            articlesObservable = mApiClient.getMaterialsArchiveArticles();
+//                            numOfArticlesObservable = articlesObservable.map(List::size);
+//                            break;
+//                        case Constants.Urls.JOKES:
+//                            articlesObservable = mApiClient.getMaterialsJokesArticles();
+//                            numOfArticlesObservable = articlesObservable.map(List::size);
+//                            break;
+//                        case Constants.Urls.OBJECTS_1:
+//                        case Constants.Urls.OBJECTS_2:
+//                        case Constants.Urls.OBJECTS_3:
+//                        case Constants.Urls.OBJECTS_RU:
+//                            articlesObservable = mApiClient.getObjectsArticles(link);
+//                            numOfArticlesObservable = articlesObservable.map(List::size);
+//                            break;
+//                        default:
+//                            articlesObservable = mApiClient.getMaterialsArticles(link);
+//                            numOfArticlesObservable = articlesObservable.map(List::size);
+//                            break;
+//                    }
+//                    loadArticlesAndCountThem(context, numOfArticlesObservable, type);
                     dialog.dismiss();
                 })
                 .neutralText(R.string.stop_download)
@@ -293,7 +256,7 @@ public abstract class DialogUtils {
     private void loadArticlesAndCountThem(
             Context context,
             Observable<Integer> countObservable,
-            @DownloadAllService.DownloadType String type
+            DownloadEntry type
     ) {
         MaterialDialog progress = new MaterialDialog.Builder(context)
                 .progress(true, 0)
@@ -325,25 +288,25 @@ public abstract class DialogUtils {
                             boolean ignoreLimit = mPreferenceManager.isHasSubscription()
                                     || mPreferenceManager.isDownloadAllEnabledForFree();
 
-                            if (type.equals(DownloadAllService.DownloadType.TYPE_ALL)) {
-                                if (!ignoreLimit) {
-                                    //simply start download all with popup for limit users,
-                                    //in which tell, that we can't now how many arts he can load
-                                    new MaterialDialog.Builder(context)
-                                            .title(R.string.download_all)
-                                            .content(context.getString(R.string.download_all_with_limit, numOfArtsAndLimit.second))
-                                            .positiveText(R.string.download)
-                                            .onPositive((dialog, which) ->
-                                                    DownloadAllService.startDownloadWithType(context, type, 0, numOfArtsAndLimit.second))
-                                            .negativeText(android.R.string.cancel)
-                                            .build()
-                                            .show();
-                                } else {
-                                    DownloadAllService.startDownloadWithType(context, type, DownloadAllService.RANGE_NONE, DownloadAllService.RANGE_NONE);
-                                }
-                            } else {
-                                showRangeDialog(context, type, numOfArtsAndLimit.first, numOfArtsAndLimit.second, ignoreLimit);
-                            }
+//                            if (type.equals(DownloadAllService.DownloadType.TYPE_ALL)) {
+//                                if (!ignoreLimit) {
+//                                    //simply start download all with popup for limit users,
+//                                    //in which tell, that we can't now how many arts he can load
+//                                    new MaterialDialog.Builder(context)
+//                                            .title(R.string.download_all)
+//                                            .content(context.getString(R.string.download_all_with_limit, numOfArtsAndLimit.second))
+//                                            .positiveText(R.string.download)
+//                                            .onPositive((dialog, which) ->
+//                                                    DownloadAllService.startDownloadWithType(context, type, 0, numOfArtsAndLimit.second))
+//                                            .negativeText(android.R.string.cancel)
+//                                            .build()
+//                                            .show();
+//                                } else {
+//                                    DownloadAllService.startDownloadWithType(context, type, DownloadAllService.RANGE_NONE, DownloadAllService.RANGE_NONE);
+//                                }
+//                            } else {
+//                                showRangeDialog(context, type, numOfArtsAndLimit.first, numOfArtsAndLimit.second, ignoreLimit);
+//                            }
                         },
                         e -> {
                             Timber.e(e);
@@ -354,7 +317,7 @@ public abstract class DialogUtils {
 
     private void showRangeDialog(
             Context context,
-            @DownloadAllService.DownloadType String type,
+            DownloadEntry type,
             int numOfArticles,
             int limit,
             boolean ignoreLimit
@@ -421,11 +384,10 @@ public abstract class DialogUtils {
             min.setText(String.valueOf(minValue));
             max.setText(String.valueOf(maxValue));
 
-            dialog.getActionButton(DialogAction.POSITIVE)
-                    .setOnClickListener(v -> {
-                        DownloadAllService.startDownloadWithType(context, type, minValue.intValue(), maxValue.intValue());
-                        dialog.dismiss();
-                    });
+            dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(v -> {
+                DownloadAllService.startDownloadWithType(context, type.resId, minValue.intValue(), maxValue.intValue(), clazz);
+                dialog.dismiss();
+            });
         });
 
         dialog.show();
@@ -436,5 +398,5 @@ public abstract class DialogUtils {
      */
     protected abstract void onIncreaseLimitClick();
 
-    protected abstract void logDownloadAttempt(DownloadType type);
+    protected abstract void logDownloadAttempt(DownloadEntry type);
 }
