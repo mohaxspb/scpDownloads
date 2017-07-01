@@ -20,7 +20,7 @@ import timber.log.Timber;
 public class DownloadDialogImpl extends DialogUtils {
 
     public DownloadDialogImpl(MyPreferenceManagerModel preferenceManager, DbProviderFactoryModel dbProviderFactory, ApiClientModel apiClient) {
-        super(preferenceManager, dbProviderFactory, apiClient);
+        super(preferenceManager, dbProviderFactory, apiClient, clazz);
     }
 
     @Override

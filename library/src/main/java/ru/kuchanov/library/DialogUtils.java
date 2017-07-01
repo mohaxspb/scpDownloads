@@ -115,15 +115,17 @@ public abstract class DialogUtils<S extends DownloadAllService> {
     private MyPreferenceManagerModel mPreferenceManager;
     private DbProviderFactoryModel mDbProviderFactory;
     private ApiClientModel mApiClient;
+    private Class clazz;
 
     public DialogUtils(
             MyPreferenceManagerModel preferenceManager,
             DbProviderFactoryModel dbProviderFactory,
-            ApiClientModel apiClient
-    ) {
+            ApiClientModel apiClient,
+            Class clazz) {
         mPreferenceManager = preferenceManager;
         mDbProviderFactory = dbProviderFactory;
         mApiClient = apiClient;
+        this.clazz = clazz;
     }
 
     public abstract List<DownloadEntry> getDownloadTypesEntries(Context context);
