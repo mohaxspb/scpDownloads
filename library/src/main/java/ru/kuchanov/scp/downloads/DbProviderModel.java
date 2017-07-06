@@ -1,4 +1,4 @@
-package ru.kuchanov.library;
+package ru.kuchanov.scp.downloads;
 
 import android.util.Pair;
 

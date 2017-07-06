@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import ru.kuchanov.library.DialogUtils;
+import ru.kuchanov.scp.downloads.DialogUtils;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {

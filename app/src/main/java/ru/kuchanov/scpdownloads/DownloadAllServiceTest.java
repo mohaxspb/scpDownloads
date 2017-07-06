@@ -4,11 +4,11 @@ import android.util.Pair;
 
 import java.util.List;
 
-import ru.kuchanov.library.ApiClientModel;
-import ru.kuchanov.library.ArticleModel;
-import ru.kuchanov.library.DbProviderModel;
-import ru.kuchanov.library.DownloadAllService;
-import ru.kuchanov.library.DownloadEntry;
+import ru.kuchanov.scp.downloads.ApiClientModel;
+import ru.kuchanov.scp.downloads.ArticleModel;
+import ru.kuchanov.scp.downloads.DbProviderModel;
+import ru.kuchanov.scp.downloads.DownloadAllService;
+import ru.kuchanov.scp.downloads.DownloadEntry;
 import rx.Observable;
 import timber.log.Timber;
 

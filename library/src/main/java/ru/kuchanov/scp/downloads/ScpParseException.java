@@ -1,4 +1,4 @@
-package ru.kuchanov.library;
+package ru.kuchanov.scp.downloads;
 
 /**
  * Created by mohax on 03.01.2017.

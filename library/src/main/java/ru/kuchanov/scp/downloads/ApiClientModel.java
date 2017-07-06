@@ -1,4 +1,4 @@
-package ru.kuchanov.library;
+package ru.kuchanov.scp.downloads;
 
 import java.util.List;
 
@@ -23,5 +23,5 @@ public interface ApiClientModel<T extends ArticleModel> {
 
     Observable<List<T>> getMaterialsArchiveArticles();
 
-    T getArticleFromApi(String url) throws Exception, ru.kuchanov.library.ScpParseException;
+    T getArticleFromApi(String url) throws Exception, ru.kuchanov.scp.downloads.ScpParseException;
 }

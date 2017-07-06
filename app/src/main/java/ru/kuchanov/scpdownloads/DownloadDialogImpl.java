@@ -5,11 +5,11 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.kuchanov.library.ApiClientModel;
-import ru.kuchanov.library.DbProviderFactoryModel;
-import ru.kuchanov.library.DialogUtils;
-import ru.kuchanov.library.DownloadEntry;
-import ru.kuchanov.library.MyPreferenceManagerModel;
+import ru.kuchanov.scp.downloads.ApiClientModel;
+import ru.kuchanov.scp.downloads.DbProviderFactoryModel;
+import ru.kuchanov.scp.downloads.DialogUtils;
+import ru.kuchanov.scp.downloads.DownloadEntry;
+import ru.kuchanov.scp.downloads.MyPreferenceManagerModel;
 import timber.log.Timber;
 
 /**
