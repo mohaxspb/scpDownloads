@@ -1,6 +1,35 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
+//here is script to generate version code from version name
+//which is set in gradle.properties as value of version var
+//which must be in format major, minor, patch, where patch goes from 0 to 99
+apply from: '../versioning.gradle'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'scp-downloads'
+
+    publishedGroupId = 'ru.kuchanov.scp'
+    libraryName = 'ScpDownloads'
+    artifact = 'scp-download'
+
+    libraryDescription = 'Mass downloads module for SCP Foundation app in GooglePlay'
+
+    siteUrl = 'https://github.com/mohaxspb/scpDownloads'
+    gitUrl = 'https://github.com/mohaxspb/scpDownloads.git'
+
+    libraryVersion = version
+
+    developerId = 'mohaxspb'
+    developerName = 'Yuri K'
+    developerEmail = 'mohax.spb@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -8,8 +37,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode buildVersionCode()
+        versionName version
     }
     buildTypes {
         release {
@@ -50,3 +79,7 @@ dependencies {
     //dialogs
     compile 'com.afollestad.material-dialogs:core:0.9.4.5'
 }
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
