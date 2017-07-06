@@ -3,20 +3,26 @@ package ru.kuchanov.library;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
+import java.io.Serializable;
+
 /**
  * Created by mohax on 27.06.2017.
  * <p>
  * for ScpDownloads
  */
-public class DownloadEntry {
+public class DownloadEntry implements Serializable {
 
     @StringRes
     public int resId;
     public String name;
+    public String url;
+    public String dbField;
 
-    public DownloadEntry(int resId, @NonNull String name) {
+    public DownloadEntry(@StringRes int resId, @NonNull String name, @NonNull String url, String dbField) {
         this.resId = resId;
         this.name = name;
+        this.url = url;
+        this.dbField = dbField;
     }
 
     @Override

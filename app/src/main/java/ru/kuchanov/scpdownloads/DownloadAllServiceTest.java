@@ -1,11 +1,14 @@
 package ru.kuchanov.scpdownloads;
 
-import java.util.ArrayList;
+import android.util.Pair;
+
 import java.util.List;
 
+import ru.kuchanov.library.ApiClientModel;
 import ru.kuchanov.library.ArticleModel;
 import ru.kuchanov.library.DbProviderModel;
 import ru.kuchanov.library.DownloadAllService;
+import ru.kuchanov.library.DownloadEntry;
 import rx.Observable;
 import timber.log.Timber;
 
@@ -15,9 +18,15 @@ import timber.log.Timber;
  * for ScpDownloads
  */
 public class DownloadAllServiceTest extends DownloadAllService {
+
     @Override
-    protected Observable<Integer> getRecentArticlesPageCountObservable() {
-        return Observable.just(3);
+    protected void download(DownloadEntry type) {
+
+    }
+
+    @Override
+    public ApiClientModel getApiClient() {
+        return null;
     }
 
     @Override
@@ -25,15 +34,6 @@ public class DownloadAllServiceTest extends DownloadAllService {
         return 30;
     }
 
-    @Override
-    protected Observable<List<ArticleModel>> getRecentArticlesForPage(int page) {
-        return Observable.unsafeCreate(subscriber -> {
-            List<ArticleModel> articleModels = new ArrayList<>();
-
-            subscriber.onNext(articleModels);
-            subscriber.onCompleted();
-        });
-    }
 
     @Override
     protected DbProviderModel getDbProviderModel() {
@@ -52,20 +52,15 @@ public class DownloadAllServiceTest extends DownloadAllService {
             public void close() {
                 Timber.d(" close");
             }
-        };
-    }
 
-    @Override
-    protected ArticleModel getArticleFromApi(String id) {
-        return new ArticleModel() {
             @Override
-            public String getUrl() {
-                return "url";
+            public int getScore() {
+                return 0;
             }
 
             @Override
-            public String getText() {
-                return "text";
+            public Observable<Pair<Integer, Integer>> saveObjectsArticlesList(List articles, String dbField) {
+                return null;
             }
         };
     }

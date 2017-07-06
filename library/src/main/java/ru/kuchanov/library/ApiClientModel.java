@@ -9,13 +9,19 @@ import rx.Observable;
  * <p>
  * for ScpDownloads
  */
-public interface ApiClientModel {
+public interface ApiClientModel<T extends ArticleModel> {
 
-    Observable<List<ArticleModel>> getMaterialsArticles(String link);
+    Observable<Integer> getRecentArticlesPageCountObservable();
 
-    Observable<List<ArticleModel>> getObjectsArticles(String link);
+    Observable<List<T>> getRecentArticlesForPage(int integer);
 
-    Observable<List<ArticleModel>> getMaterialsJokesArticles();
+    Observable<List<T>> getMaterialsArticles(String link);
 
-    Observable<List<ArticleModel>> getMaterialsArchiveArticles();
+    Observable<List<T>> getObjectsArticles(String link);
+
+    Observable<List<T>> getMaterialsJokesArticles();
+
+    Observable<List<T>> getMaterialsArchiveArticles();
+
+    T getArticleFromApi(String url) throws Exception, ru.kuchanov.library.ScpParseException;
 }

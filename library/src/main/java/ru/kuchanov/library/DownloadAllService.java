@@ -6,17 +6,18 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -27,45 +28,22 @@ import timber.log.Timber;
  * <p>
  * for scp_ru
  */
-public abstract class DownloadAllService extends Service {
-
-    private static final String TAG = DownloadAllService.class.getSimpleName();
+public abstract class DownloadAllService<T extends ArticleModel> extends Service {
 
     private static final int NOTIFICATION_ID = 42;
 
+    private static final int DELAY_BEFORE_HIDE_NOTIFICATION = 5;
+
     public static final int RANGE_NONE = Integer.MIN_VALUE;
     private static final String EXTRA_DOWNLOAD_TYPE = "EXTRA_DOWNLOAD_TYPE";
-    private static final String EXTRA_RANGE_START = "EXTRA_RANGE_START";
 
+    private static final String EXTRA_RANGE_START = "EXTRA_RANGE_START";
     private static final String EXTRA_RANGE_END = "EXTRA_RANGE_END";
     private static final String ACTION_STOP = "ACTION_STOP";
+
     private static final String ACTION_START = "ACTION_START";
 
-    private static DownloadAllService instance = null;
-
-//    @Retention(RetentionPolicy.SOURCE)
-//    @StringDef({
-//            DownloadType.TYPE_1, DownloadType.TYPE_2, DownloadType.TYPE_3, DownloadType.TYPE_4, DownloadType.TYPE_RU,
-//            DownloadType.TYPE_EXPERIMETS, DownloadType.TYPE_OTHER, DownloadType.TYPE_INCIDENTS,
-//            DownloadType.TYPE_INTERVIEWS, DownloadType.TYPE_ARCHIVE, DownloadType.TYPE_JOKES,
-//            DownloadType.TYPE_ALL
-//    })
-//    public @interface DownloadType {
-//        String TYPE_1 = "TYPE_1";
-//        String TYPE_2 = "TYPE_2";
-//        String TYPE_3 = "TYPE_3";
-//        String TYPE_4 = "TYPE_4";
-//        String TYPE_RU = "TYPE_RU";
-//
-//        String TYPE_EXPERIMETS = "TYPE_Experiments";
-//        String TYPE_OTHER = "TYPE_Other";
-//        String TYPE_INCIDENTS = "TYPE_Incidents";
-//        String TYPE_INTERVIEWS = "TYPE_Interviews";
-//        String TYPE_ARCHIVE = "TYPE_Archive";
-//        String TYPE_JOKES = "TYPE_Jokes";
-//
-//        String TYPE_ALL = "TYPE_ALL";
-//    }
+    protected static DownloadAllService instance = null;
 
     private int rangeStart;
     private int rangeEnd;
@@ -82,25 +60,22 @@ public abstract class DownloadAllService extends Service {
 
     public static void startDownloadWithType(
             Context ctx,
-            @StringRes int type,
+            DownloadEntry type,
             int rangeStart,
             int rangeEnd,
             Class clazz
     ) {
         Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_START);
-//        Bundle bundle = new Bundle();
-//        bundle.putString(EXTRA_DOWNLOAD_TYPE, type);
-//        intent.putExtras(bundle);
         intent.putExtra(EXTRA_DOWNLOAD_TYPE, type);
         intent.putExtra(EXTRA_RANGE_START, rangeStart);
         intent.putExtra(EXTRA_RANGE_END, rangeEnd);
         ctx.startService(intent);
     }
 
-    public static void stopDownload(Context ctx) {
+    public static void stopDownload(Context ctx, Class clazz) {
         Timber.d("stopDownload called");
-        Intent intent = new Intent(ctx, DownloadAllService.class);
+        Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_STOP);
         ctx.startService(intent);
     }
@@ -121,12 +96,12 @@ public abstract class DownloadAllService extends Service {
     @Override
     public void onCreate() {
         Timber.d("onCreate");
-        Log.e(TAG, "onCreate");
         super.onCreate();
         instance = this;
     }
 
     private void stopDownloadAndRemoveNotif() {
+        Timber.d("stopDownloadAndRemoveNotif");
         mCurProgress = 0;
         mMaxProgress = 0;
         mNumOfErrors = 0;
@@ -154,43 +129,41 @@ public abstract class DownloadAllService extends Service {
         rangeEnd = intent.getIntExtra(EXTRA_RANGE_END, RANGE_NONE);
         Timber.d("rangeStart/rangeEnd: %s/%s", rangeStart, rangeEnd);
 
-        @StringRes
-        int type = intent.getIntExtra(EXTRA_DOWNLOAD_TYPE, 0);
+        DownloadEntry type = (DownloadEntry) intent.getSerializableExtra(EXTRA_DOWNLOAD_TYPE);
         download(type);
 
         return super.onStartCommand(intent, flags, startId);
     }
 
-    protected abstract void download(@StringRes int type);
+    protected abstract void download(DownloadEntry type);
 
-    protected abstract Observable<Integer> getRecentArticlesPageCountObservable();
+    public abstract ApiClientModel<T> getApiClient();
 
     protected abstract int getNumOfArticlesOnRecentPage();
 
-    protected abstract Observable<List<ArticleModel>> getRecentArticlesForPage(int page);
+    protected abstract DbProviderModel<T> getDbProviderModel();
 
-    protected abstract DbProviderModel getDbProviderModel();
-
-    protected abstract ArticleModel getArticleFromApi(String id);
-
-    private void downloadAll() {
+    protected void downloadAll() {
         Timber.d("downloadAll");
         showNotificationDownloadList();
         //download list
-        Subscription subscription = getRecentArticlesPageCountObservable()
+        Subscription subscription = getApiClient().getRecentArticlesPageCountObservable()
+                .doOnError(e -> {
+                    Timber.e(e);
+                    showNotificationSimple(
+                            getString(R.string.error_notification_title),
+                            getString(R.string.error_notification_recent_list_download_content)
+                    );
+                })
+                .onExceptionResumeNext(Observable.<Integer>empty().delay(DELAY_BEFORE_HIDE_NOTIFICATION, TimeUnit.SECONDS))
                 //if we have limit we must not load all lists of articles
                 .map(pageCount -> (rangeStart != RANGE_NONE && rangeEnd != RANGE_NONE)
                         ? (int) Math.ceil((double) rangeEnd / getNumOfArticlesOnRecentPage()) : pageCount)
                 .doOnNext(pageCount -> mMaxProgress = pageCount)
-                //FI XME for test do not load all arts lists
-//                .doOnNext(pageCount -> mMaxProgress = 7)
-                .doOnError(throwable -> showNotificationSimple(
-                        getString(R.string.error_notification_title),
-                        getString(R.string.error_notification_recent_list_download_content)
-                ))
-                .onExceptionResumeNext(Observable.<Integer>empty().delay(5, TimeUnit.SECONDS))
+                //FIX ME for test do not load all arts lists
+//                .doOnNext(pageCount -> mMaxProgress = 2)
                 .flatMap(integer -> Observable.range(1, mMaxProgress))
-                .flatMap(integer -> getRecentArticlesForPage(integer)
+                .flatMap(integer -> getApiClient().getRecentArticlesForPage(integer)
                         .doOnNext(list -> {
                             mCurProgress = integer;
                             showNotificationDownloadProgress(getString(R.string.notification_recent_list_title),
@@ -205,34 +178,96 @@ public abstract class DownloadAllService extends Service {
                         })
                         .onExceptionResumeNext(Observable.empty()))
                 .toList()
-//                //test value
+//                //FIX ME test value
 //                .flatMap(list -> Observable.just(list.subList(0, mMaxProgress)))
+                .flatMap(this::downloadAndSaveArticles)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        article -> {
+                            Timber.d("download complete");
+                            stopDownloadAndRemoveNotif();
+                        }
+                );
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
+        }
+        mCompositeSubscription.add(subscription);
+    }
+
+    protected void downloadObjects(DownloadEntry type) {
+        Timber.d("downloadObjects: %s", type);
+        showNotificationDownloadList();
+        //download lists
+        Observable<List<T>> articlesObservable;
+
+        if (type.resId == R.string.type_archive) {
+            articlesObservable = getApiClient().getMaterialsArchiveArticles();
+        } else if (type.resId == R.string.type_jokes) {
+            articlesObservable = getApiClient().getMaterialsJokesArticles();
+        } else if (type.resId == R.string.type_1
+                || type.resId == R.string.type_2
+                || type.resId == R.string.type_3
+                || type.resId == R.string.type_4
+                || type.resId == R.string.type_ru) {
+            articlesObservable = getApiClient().getObjectsArticles(type.url);
+        } else {
+            articlesObservable = getApiClient().getMaterialsArticles(type.url);
+        }
+
+        //just for test use just n elements
+//        final int testMaxProgress = 8;
+        Subscription subscription = articlesObservable
+                .doOnError(throwable -> showNotificationSimple(
+                        getString(R.string.error_notification_title),
+                        getString(R.string.error_notification_objects_list_download_content)
+                ))
+                .onExceptionResumeNext(Observable.<List<T>>empty().delay(DELAY_BEFORE_HIDE_NOTIFICATION, TimeUnit.SECONDS))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(articles -> getDbProviderModel()
+                        .<Pair<Integer, Integer>>saveObjectsArticlesList(articles, type.dbField)
+                        .flatMap(integerIntegerPair -> Observable.just(articles)))
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .flatMap(this::downloadAndSaveArticles)
+                .subscribe(
+                        article -> {
+                            Timber.d("download complete");
+                            stopDownloadAndRemoveNotif();
+                        }
+                );
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
+        }
+        mCompositeSubscription.add(subscription);
+    }
+
+    private Observable<List<T>> downloadAndSaveArticles(List<T> articlesToDwonload) {
+        return Observable.just(articlesToDwonload)
                 .map(limitArticles)
                 .map(articles -> {
-                    List<ArticleModel> articlesToDownload = new ArrayList<>();
-                    DbProviderModel dbProvider = getDbProviderModel();
-                    for (ArticleModel article : articles) {
-                        ArticleModel articleInDb = dbProvider.getUnmanagedArticleSync(article.getUrl());
-                        if (articleInDb == null || TextUtils.isEmpty(articleInDb.getText())) {
+                    List<T> articlesToDownload = new ArrayList<>();
+                    DbProviderModel<T> dbProvider = getDbProviderModel();
+                    for (T article : articles) {
+                        T articleInDb = dbProvider.getUnmanagedArticleSync(article.getUrl());
+                        if (articleInDb == null || articleInDb.getText() == null) {
                             articlesToDownload.add(article);
                         } else {
                             mCurProgress++;
                             Timber.d("already downloaded: %s", article.getUrl());
                             Timber.d("mCurProgress %s, mMaxProgress: %s", mCurProgress, mMaxProgress);
-//                            showNotificationDownloadProgress(getString(R.string.download_recent_title),
-//                                    mCurProgress, mMaxProgress, mNumOfErrors);
                         }
                     }
                     dbProvider.close();
                     return articlesToDownload;
                 })
-                //download all articles and save them to DB
                 .flatMap(articles -> {
-                    DbProviderModel dbProvider = getDbProviderModel();
+                    DbProviderModel<T> dbProvider = getDbProviderModel();
                     for (int i = 0; i < articles.size(); i++) {
-                        ArticleModel articleToDownload = articles.get(i);
+                        T articleToDownload = articles.get(i);
                         try {
-                            ArticleModel articleDownloaded = getArticleFromApi(articleToDownload.getUrl());
+                            T articleDownloaded = getApiClient().getArticleFromApi(articleToDownload.getUrl());
                             if (articleDownloaded != null) {
                                 dbProvider.saveArticleSync(articleDownloaded, false);
                                 Timber.d("downloaded: %s", articleDownloaded.getUrl());
@@ -248,7 +283,7 @@ public abstract class DownloadAllService extends Service {
                                         mCurProgress, mMaxProgress, mNumOfErrors
                                 );
                             }
-                        } catch (Exception e) {
+                        } catch (Exception | ScpParseException e) {
                             Timber.e(e);
                             mNumOfErrors++;
                             mCurProgress++;
@@ -259,144 +294,26 @@ public abstract class DownloadAllService extends Service {
                         }
                     }
                     dbProvider.close();
-                    return Observable.just(null);
+                    return Observable.just(articles);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(
-                        article -> showNotificationSimple(
-                                getString(R.string.download_complete_title),
-                                getString(R.string.download_complete_title_content,
-                                        mCurProgress - mNumOfErrors, mMaxProgress, mNumOfErrors)
-                        ),
-                        e -> {
-                            Timber.e(e, "error download objects");
-                            stopDownloadAndRemoveNotif();
-                        },
-                        () -> {
-                            Timber.d("onCompleted");
-                            stopDownloadAndRemoveNotif();
-                        }
-                );
-        if (mCompositeSubscription == null) {
-            mCompositeSubscription = new CompositeSubscription();
-        }
-        mCompositeSubscription.add(subscription);
+                .doOnError(e -> {
+                    Timber.e(e);
+                    showNotificationSimple(
+                            getString(R.string.error_notification_title),
+                            getString(R.string.error_notification_download_failed, e.getMessage()));
+                })
+                .onErrorResumeNext(Observable.<List<T>>just(Collections.emptyList()).delay(DELAY_BEFORE_HIDE_NOTIFICATION, TimeUnit.SECONDS))
+                .doOnNext(articles -> showNotificationSimple(
+                        getString(R.string.download_complete_title),
+                        getString(R.string.download_complete_title_content,
+                                mCurProgress - mNumOfErrors, mMaxProgress, mNumOfErrors)
+                ))
+                .flatMap(articles -> Observable.just(articles).delay(DELAY_BEFORE_HIDE_NOTIFICATION, TimeUnit.SECONDS));
     }
 
-//    private void downloadObjects(String link, String dbField) {
-//        showNotificationDownloadList();
-//        //download lists
-//        Observable<List<Article>> articlesObservable;
-//        switch (link) {
-//            case Constants.Urls.ARCHIVE:
-//                articlesObservable = mApiClient.getMaterialsArchiveArticles();
-//                break;
-//            case Constants.Urls.JOKES:
-//                articlesObservable = mApiClient.getMaterialsJokesArticles();
-//                break;
-//            case Constants.Urls.OBJECTS_1:
-//            case Constants.Urls.OBJECTS_2:
-//            case Constants.Urls.OBJECTS_3:
-//            case Constants.Urls.OBJECTS_RU:
-//                articlesObservable = mApiClient.getObjectsArticles(link);
-//                break;
-//            default:
-//                articlesObservable = mApiClient.getMaterialsArticles(link);
-//                break;
-//        }
-//
-//        //just for test use just n elements
-////        final int testMaxProgress = 8;
-//        Subscription subscription = articlesObservable
-//                .doOnError(throwable -> showNotificationSimple(
-//                        getString(R.string.error_notification_title),
-//                        getString(R.string.error_notification_objects_list_download_content)
-//                ))
-//                .onExceptionResumeNext(Observable.<List<Article>>empty().delay(5, TimeUnit.SECONDS))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .flatMap(articles -> mDbProviderFactory.getDbProvider()
-//                        .<Pair<Integer, Integer>>saveObjectsArticlesList(articles, dbField)
-//                        .flatMap(integerIntegerPair -> Observable.just(articles)))
-//                .subscribeOn(AndroidSchedulers.mainThread())
-//                .observeOn(Schedulers.io())
-//                .map(limitArticles)
-//                .map(articles -> {
-//                    List<Article> articlesToDownload = new ArrayList<>();
-//                    DbProvider dbProvider = mDbProviderFactory.getDbProvider();
-//                    for (Article article : articles) {
-//                        Article articleInDb = dbProvider.getUnmanagedArticleSync(article.url);
-//                        if (articleInDb == null || articleInDb.text == null) {
-//                            articlesToDownload.add(article);
-//                        } else {
-//                            mCurProgress++;
-//                            Timber.d("already downloaded: %s", article.url);
-//                            Timber.d("mCurProgress %s, mMaxProgress: %s", mCurProgress, mMaxProgress);
-////                            showNotificationDownloadProgress(getString(R.string.download_objects_title), mCurProgress, mMaxProgress, mNumOfErrors);
-//                        }
-//                    }
-//                    dbProvider.close();
-//                    return articlesToDownload;
-//                })
-//                .flatMap(articles -> {
-//                    DbProvider dbProvider = mDbProviderFactory.getDbProvider();
-//                    for (int i = 0; i < articles.size(); i++) {
-//                        Article articleToDownload = articles.get(i);
-//                        try {
-//                            Article articleDownloaded = mApiClient.getArticleFromApi(articleToDownload.url);
-//                            if (articleDownloaded != null) {
-//                                dbProvider.saveArticleSync(articleDownloaded, false);
-//                                Timber.d("downloaded: %s", articleDownloaded.url);
-//                                mCurProgress++;
-//                                Timber.d("mCurProgress %s, mMaxProgress: %s", mCurProgress, mMaxProgress);
-//                                showNotificationDownloadProgress(getString(R.string.download_objects_title),
-//                                        mCurProgress, mMaxProgress, mNumOfErrors);
-//                            } else {
-//                                mNumOfErrors++;
-//                                mCurProgress++;
-//                                showNotificationDownloadProgress(
-//                                        getString(R.string.download_objects_title),
-//                                        mCurProgress, mMaxProgress, mNumOfErrors
-//                                );
-//                            }
-//                        } catch (Exception e) {
-//                            Timber.e(e);
-//                            mNumOfErrors++;
-//                            mCurProgress++;
-//                            showNotificationDownloadProgress(
-//                                    getString(R.string.download_objects_title),
-//                                    mCurProgress, mMaxProgress, mNumOfErrors
-//                            );
-//                        }
-//                    }
-//                    dbProvider.close();
-//                    return Observable.just(articles);
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .subscribe(
-//                        article -> showNotificationSimple(
-//                                getString(R.string.download_complete_title),
-//                                getString(R.string.download_complete_title_content,
-//                                        mCurProgress - mNumOfErrors, mMaxProgress, mNumOfErrors)
-//                        ),
-//                        e -> {
-//                            Timber.e(e, "error download objects");
-//                            stopDownloadAndRemoveNotif();
-//                        },
-//                        () -> {
-//                            Timber.d("onCompleted");
-//                            stopDownloadAndRemoveNotif();
-//                        }
-//                );
-//        if (mCompositeSubscription == null) {
-//            mCompositeSubscription = new CompositeSubscription();
-//        }
-//        mCompositeSubscription.add(subscription);
-//    }
-
-    private Func1<List<ArticleModel>, List<ArticleModel>> limitArticles = articles -> {
+    private Func1<List<T>, List<T>> limitArticles = articles -> {
         mCurProgress = 0;
         if (rangeStart == RANGE_NONE && rangeEnd == RANGE_NONE) {
             mMaxProgress = articles.size();

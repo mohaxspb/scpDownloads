@@ -19,8 +19,11 @@ import timber.log.Timber;
  */
 public class DownloadDialogImpl extends DialogUtils {
 
-    public DownloadDialogImpl(MyPreferenceManagerModel preferenceManager, DbProviderFactoryModel dbProviderFactory, ApiClientModel apiClient) {
-        super(preferenceManager, dbProviderFactory, apiClient, clazz);
+    public DownloadDialogImpl(
+            MyPreferenceManagerModel preferenceManager,
+            DbProviderFactoryModel dbProviderFactory,
+            ApiClientModel apiClient) {
+        super(preferenceManager, dbProviderFactory, apiClient, DownloadAllServiceTest.class);
     }
 
     @Override
@@ -38,8 +41,8 @@ public class DownloadDialogImpl extends DialogUtils {
     }
 
     @Override
-    protected void onIncreaseLimitClick() {
-        Timber.d("onIncreaseLimitClick");
+    protected void onIncreaseLimitClick(Context context) {
+
     }
 
     @Override
