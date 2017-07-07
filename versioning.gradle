@@ -9,6 +9,6 @@ ext {
 
         (major, minor, patch) = [major, minor, patch].collect{it.toInteger()}
 
-        (major * 10000) + (minor * 100) + patch;
+        (major * 1000000) + (minor * 10000) + patch;
     }
 }
