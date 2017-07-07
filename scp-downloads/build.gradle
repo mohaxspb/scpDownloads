@@ -7,11 +7,11 @@ apply plugin: 'me.tatarka.retrolambda'
 apply from: '../versioning.gradle'
 
 ext {
-    bintrayRepo = 'maven'
+    bintrayRepo = 'scp-downloads'
     bintrayName = 'scp-downloads'
 
     publishedGroupId = 'ru.kuchanov.scp'
-    libraryName = 'ScpDownloads'
+    libraryName = 'scp-download'
     artifact = 'scp-download'
 
     libraryDescription = 'Mass downloads module for SCP Foundation app in GooglePlay'
