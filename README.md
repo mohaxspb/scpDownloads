@@ -6,7 +6,8 @@ This module used by [ScpFoundationRu](https://github.com/mohaxspb/ScpFoundationR
 
 If it is published in `jcenter` you can just use this in `build.gradle(module app)`
 
-    compile 'ru.kuchanov.scp:scp-downloads:1.0.1@aar'
+    //use transitive=true to get all lib dependencies
+    compile ('ru.kuchanov.scp:scp-downloads:1.0.1@aar'){ transitive=true }
     
 Also you must add link to module repo in app-level `build.gradle` file
 
