@@ -5,10 +5,10 @@ ext {
      * Builds an Android version code from the version of the project.
      */
     buildVersionCode = {
-        def (major, minor, patch, build) = version.toLowerCase().replaceAll('-', '').tokenize('.')
+        def (major, minor, patch) = version.toLowerCase().replaceAll('-', '').tokenize('.')
 
-        (major, minor, patch, build) = [major, minor, patch, build].collect{it.toInteger()}
+        (major, minor, patch) = [major, minor, patch].collect{it.toInteger()}
 
-        (major * 1000000) + (minor * 10000) + (patch * 100) + build;
+        (major * 10000) + (minor * 100) + patch;
     }
 }
