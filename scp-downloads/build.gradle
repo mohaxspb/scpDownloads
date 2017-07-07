@@ -1,0 +1,85 @@
+apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
+
+//here is script to generate version code from version name
+//which is set in gradle.properties as value of version var
+//which must be in format major, minor, patch, where patch goes from 0 to 99
+apply from: '../versioning.gradle'
+
+ext {
+    bintrayRepo = 'scp-downloads'
+    bintrayName = 'scp-downloads'
+
+    publishedGroupId = 'ru.kuchanov.scp'
+    libraryName = 'scp-download'
+    artifact = 'scp-download'
+
+    libraryDescription = 'Mass downloads module for SCP Foundation app in GooglePlay'
+
+    siteUrl = 'https://github.com/mohaxspb/scpDownloads'
+    gitUrl = 'https://github.com/mohaxspb/scpDownloads.git'
+
+    libraryVersion = version
+
+    developerId = 'mohaxspb'
+    developerName = 'Yuri K'
+    developerEmail = 'mohax.spb@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 25
+        versionCode buildVersionCode()
+        versionName version
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:25.3.1'
+
+    //rx
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.3.0'
+    // Retrofit
+    compile('com.squareup.retrofit2:retrofit:2.3.0') {
+        exclude module: 'okhttp'
+    }
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
+    //logs
+    compile 'com.jakewharton.timber:timber:4.5.1'
+    //range seekbar
+    compile 'com.crystal:crystalrangeseekbar:1.1.3'
+    //dialogs
+    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
+}
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
