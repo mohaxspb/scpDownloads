@@ -11,8 +11,8 @@ ext {
     bintrayName = 'scp-downloads'
 
     publishedGroupId = 'ru.kuchanov.scp'
-    libraryName = 'scp-download'
-    artifact = 'scp-download'
+    libraryName = 'scp-downloads'
+    artifact = 'scp-downloads'
 
     libraryDescription = 'Mass downloads module for SCP Foundation app in GooglePlay'
 

@@ -29,9 +29,8 @@ public class DownloadDialogImpl extends DialogUtils {
     @Override
     public List<DownloadEntry> getDownloadTypesEntries(Context context) {
         List<DownloadEntry> downloadEntries = new ArrayList<>();
-//        downloadEntries.add(new DownloadEntry(R.str))
-        //TODO
-        return null;
+        downloadEntries.add(new DownloadEntry(R.string.type_1, context.getString(R.string.type_1), "test", "test"));
+        return downloadEntries;
     }
 
     @Override
