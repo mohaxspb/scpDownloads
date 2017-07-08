@@ -329,7 +329,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
 
         builder.setContentTitle(getString(R.string.download_objects_title))
                 .setAutoCancel(false)
-                .setContentText(getString(R.string.downlad_art_list))
+                .setContentText(getString(R.string.download_art_list))
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setSmallIcon(R.drawable.ic_download_white_24dp);
 

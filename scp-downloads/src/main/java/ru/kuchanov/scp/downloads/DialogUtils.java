@@ -122,7 +122,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
     ) {
         MaterialDialog progress = new MaterialDialog.Builder(context)
                 .progress(true, 0)
-                .content(R.string.downlad_art_list)
+                .content(R.string.download_art_list)
                 .cancelable(false)
                 .build();
 
