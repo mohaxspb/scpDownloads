@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/mohaxspb/scp-downloads/scp-downloads/images/download.svg) ](https://bintray.com/mohaxspb/scp-downloads/scp-downloads/_latestVersion)
+
 # Scp Downloads
 
 This module used by [ScpFoundationRu](https://github.com/mohaxspb/ScpFoundationRu) project for mass downloads of articles
