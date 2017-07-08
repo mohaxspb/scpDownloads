@@ -14,7 +14,7 @@
     <string name="notification_recent_list_title">Download list of articles</string>
     <string name="download_recent_title">Download articles</string>
     <string name="downlad_art_list_range">How much download?</string>
-    <string name="increase_limit">Increase/Remove limit</string>
+    <string name="increase_limit">Increase/remove limit</string>
     <string name="user_limit">Your limit:\n%s</string>
     <string name="no_limit">No Limits!</string>
     <string name="download_all_with_limit">Will download the latest %d articles from a list of recently changed articles (the list of \"new articles\")</string>
@@ -22,7 +22,7 @@
     <string name="limit_description_disabled_free_downloads">Limit limits the maximum number of articles, that can be stored on the device to be read in offline mode. Minimum articles limit- %1$d. The limit can be removed completely by the purchased subscription or increased authorized and earning points. For every %2$d points you can store one article more!!</string>
 
     <!--download dialog-->
-    <string name="download_all">Dwonload all</string>
+    <string name="download_all">Download all</string>
     <string name="info">Information</string>
 
     <string name="type_1">Series I</string>
