@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDialogUtils = new DownloadDialogImpl(null, null, null);
+        mDialogUtils = new DownloadDialogImpl(null, null, null, new MyConstantValues());
 
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setOnClickListener(v -> {

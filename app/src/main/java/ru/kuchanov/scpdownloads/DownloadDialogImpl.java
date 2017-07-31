@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.kuchanov.scp.downloads.ApiClientModel;
+import ru.kuchanov.scp.downloads.ConstantValues;
 import ru.kuchanov.scp.downloads.DbProviderFactoryModel;
 import ru.kuchanov.scp.downloads.DialogUtils;
 import ru.kuchanov.scp.downloads.DownloadEntry;
@@ -22,8 +23,9 @@ public class DownloadDialogImpl extends DialogUtils {
     public DownloadDialogImpl(
             MyPreferenceManagerModel preferenceManager,
             DbProviderFactoryModel dbProviderFactory,
-            ApiClientModel apiClient) {
-        super(preferenceManager, dbProviderFactory, apiClient, DownloadAllServiceTest.class);
+            ApiClientModel apiClient,
+            ConstantValues constantValues) {
+        super(preferenceManager, dbProviderFactory, apiClient, constantValues, DownloadAllServiceTest.class);
     }
 
     @Override
