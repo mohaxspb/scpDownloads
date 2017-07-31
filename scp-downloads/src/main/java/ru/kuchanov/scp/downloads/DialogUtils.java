@@ -26,19 +26,22 @@ import timber.log.Timber;
  */
 public abstract class DialogUtils<T extends ArticleModel> {
 
-    private MyPreferenceManagerModel mPreferenceManager;
-    private DbProviderFactoryModel mDbProviderFactory;
-    private ApiClientModel<T> mApiClient;
+    protected MyPreferenceManagerModel mPreferenceManager;
+    protected DbProviderFactoryModel mDbProviderFactory;
+    protected ApiClientModel<T> mApiClient;
+    protected ConstantValues mConstantValues;
     private Class clazz;
 
     public DialogUtils(
             MyPreferenceManagerModel preferenceManager,
             DbProviderFactoryModel dbProviderFactory,
             ApiClientModel<T> apiClient,
+            ConstantValues constantValues,
             Class clazz) {
         mPreferenceManager = preferenceManager;
         mDbProviderFactory = dbProviderFactory;
         mApiClient = apiClient;
+        mConstantValues = constantValues;
         this.clazz = clazz;
     }
 
