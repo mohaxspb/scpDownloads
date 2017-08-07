@@ -9,8 +9,6 @@ public interface ConstantValues {
 
     String getBaseApiUrl();
 
-    String getMain();
-
     String getMostRated();
 
     String getNewArticles();
@@ -45,19 +43,17 @@ public interface ConstantValues {
 
     String getStories();
 
-    String[] getAllLinksArray();
-
-    String getMostRecentUrl();
-
-    String getMostRatedUrl();
-
     String getSearchSiteUrl();
 
     String getRandomPageUrl();
+
+    String[] getAllLinksArray();
 
     int getNumOfArticlesOnRecentPage();
 
     int getNumOfArticlesOnRatedPage();
 
     int getNumOfArticlesOnSearchPage();
+
+    String getAppLang();
 }
