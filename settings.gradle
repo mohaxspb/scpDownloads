@@ -1,1 +1,1 @@
-include ':app', ':scp-downloads'
+include ':app', ':downloads'
