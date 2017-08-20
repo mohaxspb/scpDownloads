@@ -272,7 +272,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
             min.setText(String.valueOf(minValue));
             max.setText(String.valueOf(maxValue));
 
-            articlesSelected.setText(String.valueOf(maxValue.intValue() - minValue.intValue()));
+            articlesSelected.setText(context.getString(R.string.selected, maxValue.intValue() - minValue.intValue()));
 
             dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(v -> {
                 int range = maxValue.intValue() - minValue.intValue();
