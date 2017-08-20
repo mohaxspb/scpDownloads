@@ -147,10 +147,10 @@ public abstract class DialogUtils<T extends ArticleModel> {
                         numOfArtsAndLimit -> {
                             Timber.d("numOfArtsAndLimit: %s/%s", numOfArtsAndLimit.first, numOfArtsAndLimit.second);
                             progress.dismiss();
-                            Timber.d("mPreferenceManager.isHasSubscription(): %s",
-                                    mPreferenceManager.isHasSubscription());
-                            Timber.d("remConf.getBoolean(RemoteConfigKeys.DOWNLOAD_ALL_ENABLED_FOR_FREE): %s",
-                                    mPreferenceManager.isDownloadAllEnabledForFree());
+//                            Timber.d("mPreferenceManager.isHasSubscription(): %s",
+//                                    mPreferenceManager.isHasSubscription());
+//                            Timber.d("remConf.getBoolean(RemoteConfigKeys.DOWNLOAD_ALL_ENABLED_FOR_FREE): %s",
+//                                    mPreferenceManager.isDownloadAllEnabledForFree());
                             boolean ignoreLimit = mPreferenceManager.isHasSubscription()
                                     || mPreferenceManager.isDownloadAllEnabledForFree();
 
@@ -236,13 +236,26 @@ public abstract class DialogUtils<T extends ArticleModel> {
 //                seekbar.setFixGap(limit).apply();
 //            }
 //        } else {
-        seekbar.setMinStartValue(0).apply();
-        seekbar.setMaxStartValue(numOfArticles).apply();
+//        seekbar.setMinStartValue(0).apply();
+//        seekbar.setMaxStartValue(numOfArticles).apply();
 //        }
+
+        if (!ignoreLimit) {
+            if (limit < numOfArticles) {
+                seekbar.setMinStartValue(0).apply();
+                seekbar.setMaxValue(numOfArticles).apply();
+
+//                seekbar.setFixGap(limit).apply();
+            }
+        } else {
+            seekbar.setMinStartValue(0).apply();
+            seekbar.setMaxStartValue(numOfArticles).apply();
+        }
 
         TextView min = (TextView) view.findViewById(R.id.min);
         TextView max = (TextView) view.findViewById(R.id.max);
         TextView userLimit = (TextView) view.findViewById(R.id.userLimit);
+        TextView articlesSelected = (TextView) view.findViewById(R.id.articlesSelected);
         TextView increaseLimit = (TextView) view.findViewById(R.id.increaseLimit);
         ImageView info = (ImageView) view.findViewById(R.id.info);
 
@@ -274,6 +287,8 @@ public abstract class DialogUtils<T extends ArticleModel> {
         seekbar.setOnRangeSeekbarChangeListener((minValue, maxValue) -> {
             min.setText(String.valueOf(minValue));
             max.setText(String.valueOf(maxValue));
+
+            articlesSelected.setText(String.valueOf(maxValue.intValue() - minValue.intValue()));
 
             dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(v -> {
                 int range = maxValue.intValue() - minValue.intValue();

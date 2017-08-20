@@ -15,7 +15,7 @@
     <string name="download_recent_title">Download articles</string>
     <string name="downlad_art_list_range">How much download?</string>
     <string name="increase_limit">Increase/remove limit</string>
-    <string name="user_limit">Your limit:\n%s</string>
+    <string name="user_limit">Your limit:%s</string>
     <string name="no_limit">No Limits!</string>
     <string name="download_all_with_limit">Will download the latest %d articles from a list of recently changed articles (the list of \"new articles\")</string>
     <string name="limit_description">Limit limits the maximum number of articles, that can be stored on the device to be read in offline mode. There\'s no limit to you right now! And if you have a subscription, you will not. If you don\'t have a subscription, then one day the limit will be limited %1$d articles for unauthorized agents and %2$d + (number of points/%3$d) for authorized.</string>
