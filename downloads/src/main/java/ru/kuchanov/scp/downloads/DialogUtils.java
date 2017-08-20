@@ -230,7 +230,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
 
         if (!ignoreLimit && limit < numOfArticles) {
             seekbar.setMinStartValue(0).apply();
-            seekbar.setMaxStartValue(numOfArticles).apply();
+            seekbar.setMaxStartValue(limit).apply();
         } else {
             seekbar.setMinStartValue(0).apply();
             seekbar.setMaxStartValue(numOfArticles).apply();
