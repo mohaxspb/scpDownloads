@@ -147,10 +147,10 @@ public abstract class DialogUtils<T extends ArticleModel> {
                         numOfArtsAndLimit -> {
                             Timber.d("numOfArtsAndLimit: %s/%s", numOfArtsAndLimit.first, numOfArtsAndLimit.second);
                             progress.dismiss();
-                            Timber.d("mPreferenceManager.isHasSubscription(): %s",
-                                    mPreferenceManager.isHasSubscription());
-                            Timber.d("remConf.getBoolean(RemoteConfigKeys.DOWNLOAD_ALL_ENABLED_FOR_FREE): %s",
-                                    mPreferenceManager.isDownloadAllEnabledForFree());
+//                            Timber.d("mPreferenceManager.isHasSubscription(): %s",
+//                                    mPreferenceManager.isHasSubscription());
+//                            Timber.d("remConf.getBoolean(RemoteConfigKeys.DOWNLOAD_ALL_ENABLED_FOR_FREE): %s",
+//                                    mPreferenceManager.isDownloadAllEnabledForFree());
                             boolean ignoreLimit = mPreferenceManager.isHasSubscription()
                                     || mPreferenceManager.isDownloadAllEnabledForFree();
 
@@ -205,7 +205,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
                 );
     }
 
-    private void showRangeDialog(
+    public void showRangeDialog(
             Context context,
             DownloadEntry type,
             int numOfArticles,
@@ -228,13 +228,9 @@ public abstract class DialogUtils<T extends ArticleModel> {
         CrystalRangeSeekbar seekbar = (CrystalRangeSeekbar) view.findViewById(R.id.rangeSeekbar);
         seekbar.setMaxValue(numOfArticles).apply();
 
-        if (!ignoreLimit) {
-            if (limit < numOfArticles) {
-                seekbar.setMinStartValue(0).apply();
-                seekbar.setMaxValue(numOfArticles).apply();
-
-                seekbar.setFixGap(limit).apply();
-            }
+        if (!ignoreLimit && limit < numOfArticles) {
+            seekbar.setMinStartValue(0).apply();
+            seekbar.setMaxStartValue(limit).apply();
         } else {
             seekbar.setMinStartValue(0).apply();
             seekbar.setMaxStartValue(numOfArticles).apply();
@@ -243,6 +239,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
         TextView min = (TextView) view.findViewById(R.id.min);
         TextView max = (TextView) view.findViewById(R.id.max);
         TextView userLimit = (TextView) view.findViewById(R.id.userLimit);
+        TextView articlesSelected = (TextView) view.findViewById(R.id.articlesSelected);
         TextView increaseLimit = (TextView) view.findViewById(R.id.increaseLimit);
         ImageView info = (ImageView) view.findViewById(R.id.info);
 
@@ -275,20 +272,51 @@ public abstract class DialogUtils<T extends ArticleModel> {
             min.setText(String.valueOf(minValue));
             max.setText(String.valueOf(maxValue));
 
+            articlesSelected.setText(context.getString(R.string.selected, maxValue.intValue() - minValue.intValue()));
+
             dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(v -> {
-                DownloadAllService.startDownloadWithType(
-                        context,
-                        type,
-                        minValue.intValue(),
-                        maxValue.intValue(),
-                        clazz
-                );
-                dialog.dismiss();
+                int range = maxValue.intValue() - minValue.intValue();
+                if (!ignoreLimit && range > limit) {
+                    showFreeTrialOfferDialog(context);
+                } else {
+                    DownloadAllService.startDownloadWithType(
+                            context,
+                            type,
+                            minValue.intValue(),
+                            maxValue.intValue(),
+                            clazz
+                    );
+                    dialog.dismiss();
+                }
             });
         });
 
         dialog.show();
     }
+
+    //TODO realizev it in core and extend core realization in app via override only getdownloadtypesEntries
+    public abstract void showFreeTrialOfferDialog(Context baseActivity); /*{
+        new MaterialDialog.Builder(baseActivity)
+                .title(R.string.dialog_offer_free_trial_from_downloads_title)
+                .content(baseActivity.getString(R.string.dialog_offer_free_trial_from_downloads_content, freeTrialDaysCount, freeTrialDaysCount))
+                .positiveText(R.string.yes_bliad)
+                .onPositive((dialog, which) -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(Constants.Firebase.Analitics.EventParam.PLACE, Constants.Firebase.Analitics.EventValue.ADS_DISABLE);
+                    FirebaseAnalytics.getInstance(baseActivity).logEvent(Constants.Firebase.Analitics.EventName.FREE_TRIAL_OFFER_SHOWN, bundle);
+
+                    try {
+                        InAppHelper.startSubsBuy(baseActivity, baseActivity.getIInAppBillingService(), InAppHelper.InappType.SUBS, baseActivity.getString(R.string.subs_free_trial).split(",")[0]);
+                    } catch (Exception e) {
+                        Timber.e(e);
+                        baseActivity.showError(e);
+                    }
+                })
+                .negativeText(android.R.string.cancel)
+                .onNegative((dialog, which) -> dialog.dismiss())
+                .build()
+                .show();
+    }*/
 
     public abstract List<DownloadEntry> getDownloadTypesEntries(Context context);
 

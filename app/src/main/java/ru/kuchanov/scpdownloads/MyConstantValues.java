@@ -14,11 +14,6 @@ public class MyConstantValues implements ConstantValues {
     }
 
     @Override
-    public String getMain() {
-        return null;
-    }
-
-    @Override
     public String getMostRated() {
         return null;
     }
@@ -109,16 +104,6 @@ public class MyConstantValues implements ConstantValues {
     }
 
     @Override
-    public String getMostRecentUrl() {
-        return null;
-    }
-
-    @Override
-    public String getMostRatedUrl() {
-        return null;
-    }
-
-    @Override
     public String getSearchSiteUrl() {
         return null;
     }
@@ -141,5 +126,10 @@ public class MyConstantValues implements ConstantValues {
     @Override
     public int getNumOfArticlesOnSearchPage() {
         return 0;
+    }
+
+    @Override
+    public String getAppLang() {
+        return "ru";
     }
 }

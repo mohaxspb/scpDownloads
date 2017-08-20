@@ -15,7 +15,8 @@
     <string name="download_recent_title">Pobierz artykuły</string>
     <string name="downlad_art_list_range">Jak dużo pobierz</string>
     <string name="increase_limit">Wzrost/Usunąć limit</string>
-    <string name="user_limit">Twój limit:\n%s</string>
+    <string name="user_limit">Twój limit :%s</string>
+    <string name="selected">Wybrany: %d</string>
     <string name="no_limit">Bez ograniczeń!</string>
     <string name="download_all_with_limit">Pobierz najnowsze %d Artykuły z listy niedawno zmodyfikowany artykułów (Listy \"Nowe artykuły\")</string>
     <string name="limit_description">Limitu ogranicza maksymalną liczbę artykułów, Które mogą być przechowywane na urządzeniu do odczytu w trybie offline. Tam jest teraz bez limitu do Ciebie! I jeśli ma subskrypcji, nie będzie limitu) Jeśli nie masz subskrypcji, Raz na jakiś czas będzie ograniczony limit %1$d аrtykuły dla nieautoryzowanych agentów i %2$d + (liczba punktów/%3$d) znajdz autoryzowanych.</string>

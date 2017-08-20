@@ -15,7 +15,8 @@
     <string name="download_recent_title">Artikel herunterladen</string>
     <string name="downlad_art_list_range">Wie viel Download?</string>
     <string name="increase_limit">Limit erhöhen/entfernen</string>
-    <string name="user_limit">Dein Limit:\n%s</string>
+    <string name="user_limit">Dein Limit: %s</string>
+    <string name="selected">Ausgewählt: %d</string>
     <string name="no_limit">Keine Grenzen!</string>
     <string name="download_all_with_limit">Die letzten %d Artikel werden aus der Liste der zuletzt geänderten Artikel heruntergeladen (Liste \"Neue Artikel\")</string>
     <string name="limit_description">ЛLimit schränkt die maximale Anzahl von Artikeln ein, Das auf dem Gerät gespeichert werden kann, um im Offline Modus zu lesen. Es gibt kein Limit für Sie im Augenblick! Wenn Sie ein Abonnement erworben haben - Es wird nicht passieren) ЕWenn Sie kein Abonnement haben, wird die Begrenzung eines Tages begrenzt %1$d Artikel für unbefugte Agenten und %2$d + (Anzahl der Punkte/%3$d) für autorisierte.</string>

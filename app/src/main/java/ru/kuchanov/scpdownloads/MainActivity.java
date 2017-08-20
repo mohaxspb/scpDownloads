@@ -21,7 +21,8 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setOnClickListener(v -> {
             Timber.d("Download service start");
-            mDialogUtils.showDownloadDialog(this);
+//            mDialogUtils.showDownloadDialog(this);
+            mDialogUtils.showRangeDialog(this, null, 100, 10, false);
         });
     }
 }
