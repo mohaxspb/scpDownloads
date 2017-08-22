@@ -20,7 +20,7 @@
     <string name="no_limit">Aucune restriction!</string>
     <string name="download_all_with_limit">Ils téléchargent les dernières entrées %d de la liste des dernières entrées modifiées (liste des \«nouvel article\»)</string>
     <string name="limit_description">Limite limite le nombre maximal d\'articles qui peuvent être stockés sur un dispositif de lecture en mode offline. Maintenant, pour vous il n\'y a pas de limite! Et si vous achetez un abonnement - que et ne sera pas) Si l\'abonnement ne sont pas, puis une fois la limite est limitée à %1$d éléments à des agents non autorisés et %2$d + (nombre de points/%3$d) pour autorisé.</string>
-    <string name="limit_description_disabled_free_downloads">Limite limite le nombre maximal d\'articles qui peuvent être stockés sur un dispositif de lecture en mode hors ligne. La limite minimale des articles - %1$d. La limite peut être complètement éliminée par l\'achat d'un abonnement ou relèverai, connectez-vous et gagner des points. Pour chaque tranche de %2$d des points d vous serez en mesure de stocker un article plus!</string>
+    <string name="limit_description_disabled_free_downloads">Limite limite le nombre maximal d\'articles qui peuvent être stockés sur un dispositif de lecture en mode hors ligne. La limite minimale des articles - %1$d. La limite peut être complètement éliminée par l\'achat d\'un abonnement ou relèverai, connectez-vous et gagner des points. Pour chaque tranche de %2$d des points d vous serez en mesure de stocker un article plus!</string>
 
     <!--download dialog-->
     <string name="download_all">Télécharger tous</string>
