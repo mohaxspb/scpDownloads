@@ -47,6 +47,18 @@ public interface ConstantValues {
 
     String getRandomPageUrl();
 
+    //other filials objects
+    String getObjectsFr();
+
+    String getObjectsJp();
+
+    String getObjectsEs();
+
+    String getObjectsPl();
+
+    String getObjectsDe();
+    //end other filials objects
+
     String[] getAllLinksArray();
 
     int getNumOfArticlesOnRecentPage();
