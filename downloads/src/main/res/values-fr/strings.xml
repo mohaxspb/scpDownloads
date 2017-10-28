@@ -31,6 +31,13 @@
     <string name="type_3">Série SCP III</string>
     <string name="type_4">Série SCP IV</string>
     <string name="type_ru">Série SCP-FR</string>
+
+    <string name="type_fr">Объекты FR</string>
+    <string name="type_jp">Объекты JP</string>
+    <string name="type_es">Объекты ES</string>
+    <string name="type_pl">Объекты PL</string>
+    <string name="type_de">Объекты DE</string>
+
     <string name="type_all">Tous</string>
 
     <string name="type_experiments">Protocole expérimental</string>

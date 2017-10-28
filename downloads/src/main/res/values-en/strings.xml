@@ -31,6 +31,13 @@
     <string name="type_3">Series III</string>
     <string name="type_4">Series IV</string>
     <string name="type_ru">Series RU</string>
+
+    <string name="type_fr">Series FR</string>
+    <string name="type_jp">Series JP</string>
+    <string name="type_es">Series ES</string>
+    <string name="type_pl">Series PL</string>
+    <string name="type_de">Series DE</string>
+
     <string name="type_all">All</string>
 
     <string name="type_experiments">Experiments logs</string>
