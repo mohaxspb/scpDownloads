@@ -87,7 +87,12 @@ public abstract class DialogUtils<T extends ArticleModel> {
                             || type.resId == R.string.type_2
                             || type.resId == R.string.type_3
                             || type.resId == R.string.type_4
-                            || type.resId == R.string.type_ru) {
+                            || type.resId == R.string.type_ru
+                            || type.resId == R.string.type_fr
+                            || type.resId == R.string.type_jp
+                            || type.resId == R.string.type_es
+                            || type.resId == R.string.type_pl
+                            || type.resId == R.string.type_de) {
                         articlesObservable = mApiClient.getObjectsArticles(type.url);
                         numOfArticlesObservable = articlesObservable.map(List::size);
                     } else {
@@ -225,25 +230,34 @@ public abstract class DialogUtils<T extends ArticleModel> {
                 .build();
 
         View view = dialog.getCustomView();
-        CrystalRangeSeekbar seekbar = (CrystalRangeSeekbar) view.findViewById(R.id.rangeSeekbar);
-        seekbar.setMaxValue(numOfArticles).apply();
+        if (view == null) {
+            return;
+        }
+        CrystalRangeSeekbar seekbar = view.findViewById(R.id.rangeSeekbar);
+//        seekbar.setMaxValue(numOfArticles).apply();
+//
+////        if (!ignoreLimit && limit < numOfArticles) {
+////            seekbar.setMinStartValue(0).apply();
+////            seekbar.setMaxStartValue(limit).apply();
+////        } else {
+////            seekbar.setMinStartValue(0).apply();
+////            seekbar.setMaxStartValue(numOfArticles).apply();
+////        }
+//        seekbar.setMinStartValue(0).apply();
+//        seekbar.setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit).apply();
 
-//        if (!ignoreLimit && limit < numOfArticles) {
-//            seekbar.setMinStartValue(0).apply();
-//            seekbar.setMaxStartValue(limit).apply();
-//        } else {
-//            seekbar.setMinStartValue(0).apply();
-//            seekbar.setMaxStartValue(numOfArticles).apply();
-//        }
-        seekbar.setMinStartValue(0).apply();
-        seekbar.setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit).apply();
+        seekbar
+                .setMaxValue(numOfArticles)
+                .setMinStartValue(0)
+                .setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit)
+                .apply();
 
-        TextView min = (TextView) view.findViewById(R.id.min);
-        TextView max = (TextView) view.findViewById(R.id.max);
-        TextView userLimit = (TextView) view.findViewById(R.id.userLimit);
-        TextView articlesSelected = (TextView) view.findViewById(R.id.articlesSelected);
-        TextView increaseLimit = (TextView) view.findViewById(R.id.increaseLimit);
-        ImageView info = (ImageView) view.findViewById(R.id.info);
+        TextView min = view.findViewById(R.id.min);
+        TextView max = view.findViewById(R.id.max);
+        TextView userLimit = view.findViewById(R.id.userLimit);
+        TextView articlesSelected = view.findViewById(R.id.articlesSelected);
+        TextView increaseLimit = view.findViewById(R.id.increaseLimit);
+        ImageView info = view.findViewById(R.id.info);
 
         boolean isNightMode = mPreferenceManager.isNightMode();
         int tint = isNightMode ? Color.WHITE : ContextCompat.getColor(context, R.color.downloads_zbs_color_red);
