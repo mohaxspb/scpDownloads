@@ -234,23 +234,22 @@ public abstract class DialogUtils<T extends ArticleModel> {
             return;
         }
         CrystalRangeSeekbar seekbar = view.findViewById(R.id.rangeSeekbar);
-//        seekbar.setMaxValue(numOfArticles).apply();
-//
-////        if (!ignoreLimit && limit < numOfArticles) {
-////            seekbar.setMinStartValue(0).apply();
-////            seekbar.setMaxStartValue(limit).apply();
-////        } else {
-////            seekbar.setMinStartValue(0).apply();
-////            seekbar.setMaxStartValue(numOfArticles).apply();
-////        }
+        seekbar.setMaxValue(numOfArticles).apply();
+        seekbar.setMinStartValue(0).apply();
+
+        if (!ignoreLimit && limit < numOfArticles) {
+            seekbar.setMaxStartValue(limit).apply();
+        } else {
+            seekbar.setMaxStartValue(numOfArticles).apply();
+        }
 //        seekbar.setMinStartValue(0).apply();
 //        seekbar.setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit).apply();
 
-        seekbar
-                .setMaxValue(numOfArticles)
-                .setMinStartValue(0)
-                .setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit)
-                .apply();
+//        seekbar
+//                .setMaxValue(numOfArticles)
+//                .setMinStartValue(0)
+//                .setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit)
+//                .apply();
 
         TextView min = view.findViewById(R.id.min);
         TextView max = view.findViewById(R.id.max);
