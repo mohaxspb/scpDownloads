@@ -209,7 +209,12 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
                 || type.resId == R.string.type_2
                 || type.resId == R.string.type_3
                 || type.resId == R.string.type_4
-                || type.resId == R.string.type_ru) {
+                || type.resId == R.string.type_ru
+                || type.resId == R.string.type_fr
+                || type.resId == R.string.type_jp
+                || type.resId == R.string.type_es
+                || type.resId == R.string.type_pl
+                || type.resId == R.string.type_de) {
             articlesObservable = getApiClient().getObjectsArticles(type.url);
         } else {
             articlesObservable = getApiClient().getMaterialsArticles(type.url);
