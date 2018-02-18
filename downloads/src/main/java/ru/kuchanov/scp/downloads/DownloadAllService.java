@@ -43,7 +43,9 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
 
     private static final String ACTION_START = "ACTION_START";
 
-    protected static DownloadAllService instance = null;
+    private static final String CHANEL_ID = "DOWNLOADS_CHANEL_ID";
+
+    protected static DownloadAllService instance;
 
     private int rangeStart;
     private int rangeEnd;
@@ -59,13 +61,13 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
     }
 
     public static void startDownloadWithType(
-            Context ctx,
-            DownloadEntry type,
-            int rangeStart,
-            int rangeEnd,
-            Class clazz
+            final Context ctx,
+            final DownloadEntry type,
+            final int rangeStart,
+            final int rangeEnd,
+            final Class clazz
     ) {
-        Intent intent = new Intent(ctx, clazz);
+        final Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_START);
         intent.putExtra(EXTRA_DOWNLOAD_TYPE, type);
         intent.putExtra(EXTRA_RANGE_START, rangeStart);
@@ -73,9 +75,9 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         ctx.startService(intent);
     }
 
-    public static void stopDownload(Context ctx, Class clazz) {
+    public static void stopDownload(final Context ctx, final Class clazz) {
         Timber.d("stopDownload called");
-        Intent intent = new Intent(ctx, clazz);
+        final Intent intent = new Intent(ctx, clazz);
         intent.setAction(ACTION_STOP);
         ctx.startService(intent);
     }
@@ -89,7 +91,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(final Intent intent) {
         return null;
     }
 
@@ -113,7 +115,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         Timber.d("onStartCommand: %s, %s, %s", intent, false, startId);
         if (intent == null || TextUtils.isEmpty(intent.getAction())) {
             stopDownloadAndRemoveNotif();
@@ -129,7 +131,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         rangeEnd = intent.getIntExtra(EXTRA_RANGE_END, RANGE_NONE);
         Timber.d("rangeStart/rangeEnd: %s/%s", rangeStart, rangeEnd);
 
-        DownloadEntry type = (DownloadEntry) intent.getSerializableExtra(EXTRA_DOWNLOAD_TYPE);
+        final DownloadEntry type = (DownloadEntry) intent.getSerializableExtra(EXTRA_DOWNLOAD_TYPE);
         download(type);
 
         return super.onStartCommand(intent, flags, startId);
@@ -147,7 +149,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         Timber.d("downloadAll");
         showNotificationDownloadList();
         //download list
-        Subscription subscription = getApiClient().getRecentArticlesPageCountObservable()
+        final Subscription subscription = getApiClient().getRecentArticlesPageCountObservable()
                 .doOnError(e -> {
                     Timber.e(e);
                     showNotificationSimple(
@@ -195,11 +197,11 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         mCompositeSubscription.add(subscription);
     }
 
-    protected void downloadObjects(DownloadEntry type) {
+    protected void downloadObjects(final DownloadEntry type) {
         Timber.d("downloadObjects: %s", type);
         showNotificationDownloadList();
         //download lists
-        Observable<List<T>> articlesObservable;
+        final Observable<List<T>> articlesObservable;
 
         if (type.resId == R.string.type_archive) {
             articlesObservable = getApiClient().getMaterialsArchiveArticles();
@@ -222,7 +224,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
 
         //just for test use just n elements
 //        final int testMaxProgress = 8;
-        Subscription subscription = articlesObservable
+        final Subscription subscription = articlesObservable
                 .doOnError(throwable -> showNotificationSimple(
                         getString(R.string.error_notification_title),
                         getString(R.string.error_notification_objects_list_download_content)
@@ -248,7 +250,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         mCompositeSubscription.add(subscription);
     }
 
-    private Observable<List<T>> downloadAndSaveArticles(List<T> articlesToDwonload) {
+    private Observable<List<T>> downloadAndSaveArticles(final List<T> articlesToDwonload) {
         return Observable.just(articlesToDwonload)
                 .map(limitArticles)
                 .map(articles -> {
@@ -318,7 +320,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
                 .flatMap(articles -> Observable.just(articles).delay(DELAY_BEFORE_HIDE_NOTIFICATION, TimeUnit.SECONDS));
     }
 
-    private Func1<List<T>, List<T>> limitArticles = articles -> {
+    private final Func1<List<T>, List<T>> limitArticles = articles -> {
         mCurProgress = 0;
         if (rangeStart == RANGE_NONE && rangeEnd == RANGE_NONE) {
             mMaxProgress = articles.size();
@@ -330,7 +332,7 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
     };
 
     private void showNotificationDownloadList() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANEL_ID);
 
         builder.setContentTitle(getString(R.string.download_objects_title))
                 .setAutoCancel(false)
@@ -341,9 +343,9 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         startForeground(NOTIFICATION_ID, builder.build());
     }
 
-    private void showNotificationDownloadProgress(String title, int cur, int max, int errorsCount) {
-        NotificationCompat.Builder builderArticlesList = new NotificationCompat.Builder(this);
-        String content = getString(R.string.download_progress_content, cur, max, errorsCount);
+    private void showNotificationDownloadProgress(final CharSequence title, final int cur, final int max, final int errorsCount) {
+        final NotificationCompat.Builder builderArticlesList = new NotificationCompat.Builder(this, CHANEL_ID);
+        final String content = getString(R.string.download_progress_content, cur, max, errorsCount);
         builderArticlesList.setContentTitle(title)
                 .setAutoCancel(false)
                 .setContentText(content)
@@ -354,8 +356,8 @@ public abstract class DownloadAllService<T extends ArticleModel> extends Service
         startForeground(NOTIFICATION_ID, builderArticlesList.build());
     }
 
-    private void showNotificationSimple(String title, String content) {
-        NotificationCompat.Builder builderArticlesList = new NotificationCompat.Builder(this);
+    private void showNotificationSimple(final CharSequence title, final CharSequence content) {
+        final NotificationCompat.Builder builderArticlesList = new NotificationCompat.Builder(this, CHANEL_ID);
         builderArticlesList
                 .setContentTitle(title)
                 .setContentText(content)

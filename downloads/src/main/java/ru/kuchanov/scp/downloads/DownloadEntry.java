@@ -13,12 +13,18 @@ import java.io.Serializable;
 public class DownloadEntry implements Serializable {
 
     @StringRes
-    public int resId;
+    public final int resId;
     public String name;
     public String url;
     public String dbField;
 
-    public DownloadEntry(@StringRes int resId, @NonNull String name, @NonNull String url, String dbField) {
+    public DownloadEntry(
+            @StringRes final int resId,
+            @NonNull final String name,
+            @NonNull final String url,
+            final String dbField
+    ) {
+        super();
         this.resId = resId;
         this.name = name;
         this.url = url;
@@ -26,11 +32,15 @@ public class DownloadEntry implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        DownloadEntry that = (DownloadEntry) o;
+        final DownloadEntry that = (DownloadEntry) o;
 
         return resId == that.resId && name.equals(that.name);
     }

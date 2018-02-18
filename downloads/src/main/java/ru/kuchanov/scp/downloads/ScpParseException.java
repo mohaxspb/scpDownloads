@@ -7,13 +7,14 @@ package ru.kuchanov.scp.downloads;
  */
 public class ScpParseException extends Throwable {
 
-    private String message;
+    private final String message;
 
-    public ScpParseException(String s) {
+    public ScpParseException(final String s) {
         super(s);
         message = s;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

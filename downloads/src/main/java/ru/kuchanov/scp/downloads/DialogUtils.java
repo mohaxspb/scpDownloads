@@ -30,14 +30,15 @@ public abstract class DialogUtils<T extends ArticleModel> {
     protected DbProviderFactoryModel mDbProviderFactory;
     protected ApiClientModel<T> mApiClient;
     protected ConstantValues mConstantValues;
-    private Class clazz;
+    private final Class clazz;
 
     public DialogUtils(
-            MyPreferenceManagerModel preferenceManager,
-            DbProviderFactoryModel dbProviderFactory,
-            ApiClientModel<T> apiClient,
-            ConstantValues constantValues,
-            Class clazz) {
+            final MyPreferenceManagerModel preferenceManager,
+            final DbProviderFactoryModel dbProviderFactory,
+            final ApiClientModel<T> apiClient,
+            final ConstantValues constantValues,
+            final Class clazz) {
+        super();
         mPreferenceManager = preferenceManager;
         mDbProviderFactory = dbProviderFactory;
         mApiClient = apiClient;
@@ -45,11 +46,10 @@ public abstract class DialogUtils<T extends ArticleModel> {
         this.clazz = clazz;
     }
 
-    public void showDownloadDialog(Context context) {
-        List<DownloadEntry> entries = getDownloadTypesEntries(context);
+    public void showDownloadDialog(final Context context) {
+        final List<DownloadEntry> entries = getDownloadTypesEntries(context);
 
-        MaterialDialog materialDialog;
-        materialDialog = new MaterialDialog.Builder(context)
+        final MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.download_all_title)
                 .items(entries)
                 .itemsCallbackSingleChoice(-1, (dialog, itemView, which, text) -> {
@@ -124,11 +124,11 @@ public abstract class DialogUtils<T extends ArticleModel> {
     }
 
     private void loadArticlesAndCountThem(
-            Context context,
-            Observable<Integer> countObservable,
-            DownloadEntry type
+            final Context context,
+            final Observable<Integer> countObservable,
+            final DownloadEntry type
     ) {
-        MaterialDialog progress = new MaterialDialog.Builder(context)
+        final MaterialDialog progress = new MaterialDialog.Builder(context)
                 .progress(true, 0)
                 .content(R.string.download_art_list)
                 .cancelable(false)
@@ -156,8 +156,8 @@ public abstract class DialogUtils<T extends ArticleModel> {
 //                                    mPreferenceManager.isHasSubscription());
 //                            Timber.d("remConf.getBoolean(RemoteConfigKeys.DOWNLOAD_ALL_ENABLED_FOR_FREE): %s",
 //                                    mPreferenceManager.isDownloadAllEnabledForFree());
-                            boolean ignoreLimit = mPreferenceManager.isHasSubscription()
-                                    || mPreferenceManager.isDownloadAllEnabledForFree();
+                            final boolean ignoreLimit = mPreferenceManager.isHasSubscription()
+                                                        || mPreferenceManager.isDownloadAllEnabledForFree();
 
                             if (type.resId == R.string.type_all) {
                                 if (!ignoreLimit) {
@@ -211,16 +211,16 @@ public abstract class DialogUtils<T extends ArticleModel> {
     }
 
     public void showRangeDialog(
-            Context context,
-            DownloadEntry type,
-            int numOfArticles,
-            int limit,
-            boolean ignoreLimit
+            final Context context,
+            final DownloadEntry type,
+            final int numOfArticles,
+            final int limit,
+            final boolean ignoreLimit
     ) {
         Timber.d("showRangeDialog type/numOfArticles/limit/ignoreLimit: %s/%s/%s/%s",
                 type, numOfArticles, limit, ignoreLimit);
 
-        MaterialDialog dialog = new MaterialDialog.Builder(context)
+        final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .customView(R.layout.dialog_download_range, false)
                 .title(R.string.downlad_art_list_range)
                 .cancelable(false)
@@ -229,11 +229,11 @@ public abstract class DialogUtils<T extends ArticleModel> {
                 .positiveText(R.string.download)
                 .build();
 
-        View view = dialog.getCustomView();
+        final View view = dialog.getCustomView();
         if (view == null) {
             return;
         }
-        CrystalRangeSeekbar seekbar = view.findViewById(R.id.rangeSeekbar);
+        final CrystalRangeSeekbar seekbar = view.findViewById(R.id.rangeSeekbar);
         seekbar.setMaxValue(numOfArticles).apply();
         seekbar.setMinStartValue(0).apply();
 
@@ -251,21 +251,21 @@ public abstract class DialogUtils<T extends ArticleModel> {
 //                .setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit)
 //                .apply();
 
-        TextView min = view.findViewById(R.id.min);
-        TextView max = view.findViewById(R.id.max);
-        TextView userLimit = view.findViewById(R.id.userLimit);
-        TextView articlesSelected = view.findViewById(R.id.articlesSelected);
-        TextView increaseLimit = view.findViewById(R.id.increaseLimit);
-        ImageView info = view.findViewById(R.id.info);
+        final TextView min = view.findViewById(R.id.min);
+        final TextView max = view.findViewById(R.id.max);
+        final TextView userLimit = view.findViewById(R.id.userLimit);
+        final TextView articlesSelected = view.findViewById(R.id.articlesSelected);
+        final TextView increaseLimit = view.findViewById(R.id.increaseLimit);
+        final ImageView info = view.findViewById(R.id.info);
 
-        boolean isNightMode = mPreferenceManager.isNightMode();
-        int tint = isNightMode ? Color.WHITE : ContextCompat.getColor(context, R.color.downloads_zbs_color_red);
+        final boolean isNightMode = mPreferenceManager.isNightMode();
+        final int tint = isNightMode ? Color.WHITE : ContextCompat.getColor(context, R.color.downloads_zbs_color_red);
         info.setColorFilter(tint);
 
-        int scorePerArt = mPreferenceManager.getScorePerArt();
-        int freeOfflineLimit = mPreferenceManager.getFreeOfflineLimit();
+        final int scorePerArt = mPreferenceManager.getScorePerArt();
+        final int freeOfflineLimit = mPreferenceManager.getFreeOfflineLimit();
 
-        String limitDescriptionText;
+        final String limitDescriptionText;
         if (ignoreLimit) {
             limitDescriptionText = context.getString(R.string.limit_description, freeOfflineLimit, freeOfflineLimit, scorePerArt);
         } else {
@@ -290,7 +290,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
             articlesSelected.setText(context.getString(R.string.selected, maxValue.intValue() - minValue.intValue()));
 
             dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(v -> {
-                int range = maxValue.intValue() - minValue.intValue();
+                final int range = maxValue.intValue() - minValue.intValue();
                 if (!ignoreLimit && range > limit) {
                     showFreeTrialOfferDialog(context);
                 } else {
