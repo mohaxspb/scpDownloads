@@ -19,7 +19,7 @@
     <string name="selected">Selezionato: %d</string>
     <string name="no_limit">Nessun limite!</string>
     <string name="download_all_with_limit">Scaricherà gli ultimi %d articoli dall\'elenco degli articoli modificati di recente (la lista dei \"nuovi articoli\")</string>
-    <string name="limit_description">Il limite limita il numero massimo di articoli che possono essere memorizzati su un dispositivo da leggere in modalità offline. Non c\'è limite a te ora! E se compri un abbonamento, non lo farai) Se non si dispone di un abbonamento, un giorno il limite sarà limitato a %1$d articoli per agenti non autorizzati e %2$d + (numero di punti/%3$d) er autorizzato.</string>
+    <!--<string name="limit_description">Il limite limita il numero massimo di articoli che possono essere memorizzati su un dispositivo da leggere in modalità offline. Non c\'è limite a te ora! E se compri un abbonamento, non lo farai) Se non si dispone di un abbonamento, un giorno il limite sarà limitato a %1$d articoli per agenti non autorizzati e %2$d + (numero di punti/%3$d) er autorizzato.</string>-->
     <string name="limit_description_disabled_free_downloads">Il limite limita il numero massimo di articoli che possono essere memorizzati su un dispositivo da leggere in modalità offline. МLimite minimo dell\'articolo - %1$d. Il limite può essere completamente rimosso o sollevato, registrando e guadagnando punti. Per ogni %2$d punti, è possibile mantenere un articolo più!</string>
 
     <!--download dialog-->

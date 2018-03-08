@@ -19,7 +19,7 @@
     <string name="selected">Wybrany: %d</string>
     <string name="no_limit">Bez ograniczeń!</string>
     <string name="download_all_with_limit">Pobierz najnowsze %d Artykuły z listy niedawno zmodyfikowany artykułów (Listy \"Nowe artykuły\")</string>
-    <string name="limit_description">Limitu ogranicza maksymalną liczbę artykułów, Które mogą być przechowywane na urządzeniu do odczytu w trybie offline. Tam jest teraz bez limitu do Ciebie! I jeśli ma subskrypcji, nie będzie limitu) Jeśli nie masz subskrypcji, Raz na jakiś czas będzie ograniczony limit %1$d аrtykuły dla nieautoryzowanych agentów i %2$d + (liczba punktów/%3$d) znajdz autoryzowanych.</string>
+    <!--<string name="limit_description">Limitu ogranicza maksymalną liczbę artykułów, Które mogą być przechowywane na urządzeniu do odczytu w trybie offline. Tam jest teraz bez limitu do Ciebie! I jeśli ma subskrypcji, nie będzie limitu) Jeśli nie masz subskrypcji, Raz na jakiś czas będzie ograniczony limit %1$d аrtykuły dla nieautoryzowanych agentów i %2$d + (liczba punktów/%3$d) znajdz autoryzowanych.</string>-->
     <string name="limit_description_disabled_free_downloads">Dopuszczalne limity Maksymalna liczba artykułów, Które mogą być przechowywane na urządzeniu do czytania w trybie offline. Artykuł minimalny limit - %1$d. Limit może być całkowicie usunięte poprzez zakup subskrypcji lub podnieść, rejestrowanie i zarabiać okulary. Dla każdego %2$d punkty Można przechowywać jeden artykuł o więcej!</string>
 
     <!--download dialog-->
