@@ -27,9 +27,13 @@ import timber.log.Timber;
 public abstract class DialogUtils<T extends ArticleModel> {
 
     protected MyPreferenceManagerModel mPreferenceManager;
+
     protected DbProviderFactoryModel mDbProviderFactory;
+
     protected ApiClientModel<T> mApiClient;
+
     protected ConstantValues mConstantValues;
+
     private final Class clazz;
 
     public DialogUtils(
@@ -37,7 +41,8 @@ public abstract class DialogUtils<T extends ArticleModel> {
             final DbProviderFactoryModel dbProviderFactory,
             final ApiClientModel<T> apiClient,
             final ConstantValues constantValues,
-            final Class clazz) {
+            final Class clazz
+    ) {
         super();
         mPreferenceManager = preferenceManager;
         mDbProviderFactory = dbProviderFactory;
@@ -84,15 +89,15 @@ public abstract class DialogUtils<T extends ArticleModel> {
                         articlesObservable = mApiClient.getMaterialsJokesArticles();
                         numOfArticlesObservable = articlesObservable.map(List::size);
                     } else if (type.resId == R.string.type_1
-                            || type.resId == R.string.type_2
-                            || type.resId == R.string.type_3
-                            || type.resId == R.string.type_4
-                            || type.resId == R.string.type_ru
-                            || type.resId == R.string.type_fr
-                            || type.resId == R.string.type_jp
-                            || type.resId == R.string.type_es
-                            || type.resId == R.string.type_pl
-                            || type.resId == R.string.type_de) {
+                               || type.resId == R.string.type_2
+                               || type.resId == R.string.type_3
+                               || type.resId == R.string.type_4
+                               || type.resId == R.string.type_ru
+                               || type.resId == R.string.type_fr
+                               || type.resId == R.string.type_jp
+                               || type.resId == R.string.type_es
+                               || type.resId == R.string.type_pl
+                               || type.resId == R.string.type_de) {
                         articlesObservable = mApiClient.getObjectsArticles(type.url);
                         numOfArticlesObservable = articlesObservable.map(List::size);
                     } else {
@@ -217,8 +222,13 @@ public abstract class DialogUtils<T extends ArticleModel> {
             final int limit,
             final boolean ignoreLimit
     ) {
-        Timber.d("showRangeDialog type/numOfArticles/limit/ignoreLimit: %s/%s/%s/%s",
-                type, numOfArticles, limit, ignoreLimit);
+        Timber.d(
+                "showRangeDialog type/numOfArticles/limit/ignoreLimit: %s/%s/%s/%s",
+                type,
+                numOfArticles,
+                limit,
+                ignoreLimit
+        );
 
         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .customView(R.layout.dialog_download_range, false)
@@ -242,14 +252,6 @@ public abstract class DialogUtils<T extends ArticleModel> {
         } else {
             seekbar.setMaxStartValue(numOfArticles).apply();
         }
-//        seekbar.setMinStartValue(0).apply();
-//        seekbar.setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit).apply();
-
-//        seekbar
-//                .setMaxValue(numOfArticles)
-//                .setMinStartValue(0)
-//                .setMaxStartValue(ignoreLimit ? numOfArticles : limit < numOfArticles ? numOfArticles : limit)
-//                .apply();
 
         final TextView min = view.findViewById(R.id.min);
         final TextView max = view.findViewById(R.id.max);
@@ -265,12 +267,7 @@ public abstract class DialogUtils<T extends ArticleModel> {
         final int scorePerArt = mPreferenceManager.getScorePerArt();
         final int freeOfflineLimit = mPreferenceManager.getFreeOfflineLimit();
 
-        final String limitDescriptionText;
-        if (ignoreLimit) {
-            limitDescriptionText = context.getString(R.string.limit_description, freeOfflineLimit, freeOfflineLimit, scorePerArt);
-        } else {
-            limitDescriptionText = context.getString(R.string.limit_description_disabled_free_downloads, freeOfflineLimit, scorePerArt);
-        }
+        final String limitDescriptionText = context.getString(R.string.limit_description_disabled_free_downloads, freeOfflineLimit, scorePerArt);
         info.setOnClickListener(view1 -> new MaterialDialog.Builder(context)
                 .title(R.string.info)
                 .content(limitDescriptionText)
@@ -280,8 +277,10 @@ public abstract class DialogUtils<T extends ArticleModel> {
         increaseLimit.setVisibility(ignoreLimit ? View.INVISIBLE : View.VISIBLE);
         increaseLimit.setOnClickListener(v -> onIncreaseLimitClick(context));
 
-        userLimit.setText(context.getString(R.string.user_limit, ignoreLimit
-                ? context.getString(R.string.no_limit) : String.valueOf(limit)));
+        userLimit.setText(context.getString(
+                R.string.user_limit,
+                ignoreLimit ? context.getString(R.string.no_limit) : String.valueOf(limit)
+        ));
 
         seekbar.setOnRangeSeekbarChangeListener((minValue, maxValue) -> {
             min.setText(String.valueOf(minValue));
@@ -309,29 +308,10 @@ public abstract class DialogUtils<T extends ArticleModel> {
         dialog.show();
     }
 
-    //TODO realizev it in core and extend core realization in app via override only getdownloadtypesEntries
-    public abstract void showFreeTrialOfferDialog(Context baseActivity); /*{
-        new MaterialDialog.Builder(baseActivity)
-                .title(R.string.dialog_offer_free_trial_from_downloads_title)
-                .content(baseActivity.getString(R.string.dialog_offer_free_trial_from_downloads_content, freeTrialDaysCount, freeTrialDaysCount))
-                .positiveText(R.string.yes_bliad)
-                .onPositive((dialog, which) -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putString(Constants.Firebase.Analitics.EventParam.PLACE, Constants.Firebase.Analitics.EventValue.ADS_DISABLE);
-                    FirebaseAnalytics.getInstance(baseActivity).logEvent(Constants.Firebase.Analitics.EventName.FREE_TRIAL_OFFER_SHOWN, bundle);
-
-                    try {
-                        InAppHelper.startSubsBuy(baseActivity, baseActivity.getIInAppBillingService(), InAppHelper.InappType.SUBS, baseActivity.getString(R.string.subs_free_trial).split(",")[0]);
-                    } catch (Exception e) {
-                        Timber.e(e);
-                        baseActivity.showError(e);
-                    }
-                })
-                .negativeText(android.R.string.cancel)
-                .onNegative((dialog, which) -> dialog.dismiss())
-                .build()
-                .show();
-    }*/
+    /**
+     * realize it in core and extend core realization in app via override only getdownloadtypesEntries
+     */
+    public abstract void showFreeTrialOfferDialog(Context baseActivity);
 
     public abstract List<DownloadEntry> getDownloadTypesEntries(Context context);
 
